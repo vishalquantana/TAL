@@ -35,6 +35,7 @@ import RoleLogin from "./RoleLogin";
 import VolunteerLogin from "./volunteerlogin";  // import volunteer login
 import Register from "./register";              // import register
 import StudentForm from "./studentform";        // import student form
+import StudentDashboard from "./studentdashboard";
 
 function App() {
   return (
@@ -57,6 +58,7 @@ function App() {
 
         {/* Student Form page */}
         <Route path="/studentform" element={<StudentForm />} />
+        <Route path="/student-dashboard" element={<StudentDashboard />} />
       </Routes>
     </Router>
   );
