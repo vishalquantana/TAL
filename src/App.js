@@ -27,38 +27,43 @@
 // }
 
 // //export default App;
+
+
+
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import CoverPage from "./CoverPage";
 import LoginProfiles from "./loginProfiles";
 import RoleLogin from "./RoleLogin";
+<<<<<<< HEAD
+import VolunteerLogin from "./volunteerlogin";
+import Register from "./register";
+import StudentForm from "./studentform";
+
 import VolunteerLogin from "./volunteerlogin";  // import volunteer login
 import Register from "./register";              // import register
 import StudentForm from "./studentform";        // import student form
 import StudentDashboard from "./studentdashboard";
 
+
 function App() {
   return (
     <Router>
       <Routes>
-        {/* Cover Page */}
+        {/* Cover page shows first */}
         <Route path="/" element={<CoverPage />} />
 
-        {/* Role Selection */}
-        <Route path="/login" element={<LoginProfiles />} />
-
-        {/* Role-specific login with shared component */}
-        <Route path="/login/:role" element={<RoleLogin />} />
-
-        {/* Volunteer-specific login page */}
+        {/* Volunteer auth */}
         <Route path="/volunteerlogin" element={<VolunteerLogin />} />
-
-        {/* Volunteer registration page */}
         <Route path="/register" element={<Register />} />
 
-        {/* Student Form page */}
+        {/* Student flow */}
         <Route path="/studentform" element={<StudentForm />} />
+<<<<<<< HEAD
+  {/* StudentDocs route removed as requested */}
+=======
         <Route path="/student-dashboard" element={<StudentDashboard />} />
+>>>>>>> c9069c44d261769edaf1de5381fec5a7b348344c
       </Routes>
     </Router>
   );
