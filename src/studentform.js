@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "./StudentForm.css";
+import VolunteerProfile from "./VolunteerProfile";
 
 export default function StudentForm() {
   // State for form fields
@@ -148,6 +149,7 @@ export default function StudentForm() {
 
   return (
     <div className="form-container">
+      <VolunteerProfile />
       <h1 className="form-title">STUDENT APPLICATION FORM</h1>
 
       <form onSubmit={handleSubmit}>
@@ -273,11 +275,12 @@ export default function StudentForm() {
               />
             </label>
             <label className="full-width">
-              <span className="field-label">Who all are there in the family:<span className="required">*</span></span>
+              <span className="field-label">Who all are there in the family?<span className="required">*</span></span>
               <input
                 type="text"
                 name="family_members"
                 value={formData.family_members || ""}
+                placeholder="e.g. Mother, Father, 2 siblings"
                 onChange={handleInputChange}
                 required
               />
@@ -288,6 +291,7 @@ export default function StudentForm() {
                 type="text"
                 name="parents_full_names"
                 value={formData.parents_full_names || ""}
+                placeholder="e.g. Asha Devi (Mother), Rajesh Kumar (Father)"
                 onChange={handleInputChange}
                 required
               />
@@ -298,6 +302,7 @@ export default function StudentForm() {
                 type="text"
                 name="earning_members"
                 value={formData.earning_members || ""}
+                placeholder="e.g. Father - Farmer; Mother - Sewing work"
                 onChange={handleInputChange}
                 required
               />

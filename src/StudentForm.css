@@ -60,6 +60,35 @@
   -moz-appearance: textfield; /* Firefox */
 }
 
+/* Volunteer profile small box */
+.volunteer-profile {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  background: linear-gradient(180deg, #ffffff, #fbfbfb);
+  border: 1px solid rgba(0,0,0,0.06);
+  padding: 12px;
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgba(20,24,40,0.08);
+  width: 280px;
+  z-index: 1000;
+  font-size: 14px;
+  display: flex;
+  gap: 10px;
+}
+.vp-left { flex: 0 0 56px; display:flex; align-items:center; }
+.vp-right { flex: 1 1 auto; display:flex; flex-direction:column; }
+.vp-avatar { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; border: 1px solid rgba(0,0,0,0.06); }
+.vp-initials { display:flex; align-items:center; justify-content:center; background:#4a90e2; color:#fff; font-weight:700; font-size:18px; }
+.vp-name { font-weight:700; color:#111; margin-bottom:2px; }
+.vp-role { font-size:12px; color:#6b7280; margin-bottom:6px; }
+.vp-email { font-size:12px; color:#374151; margin-bottom:8px; word-break:break-word; }
+.vp-actions { display:flex; gap:8px; }
+.vp-btn { padding:6px 8px; border-radius:6px; border:1px solid rgba(0,0,0,0.06); background:#fff; cursor:pointer; font-size:13px; }
+.vp-btn.vp-view { background: linear-gradient(90deg,#eef2ff,#f9fbff); color:#1f2937; }
+.vp-btn.vp-logout { background:#ef4444; color:#fff; border:none; }
+.vp-btn.vp-logout:hover { background:#dc2626; }
+
 /* Keep the field-label layout */
 .field-label {
   display: flex;
