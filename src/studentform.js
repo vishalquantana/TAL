@@ -23,7 +23,11 @@ export default function StudentForm() {
     aspiration: "",
     scholarship: "",
     certificates: "",
-    years_area: ""
+    years_area: "",
+    account_no: "",
+    bank_name: "",
+    bank_branch: "",
+    ifsc_code: ""
   });
 
   // State for file uploads
@@ -38,7 +42,6 @@ export default function StudentForm() {
     student_signature: null,
   });
 
-  const [bankAccount, setBankAccount] = useState("");
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -53,12 +56,22 @@ export default function StudentForm() {
   };
 
   const allUploaded =
-    Object.values(files).every((f) => f !== null) && bankAccount.trim() !== "";
+    Object.values(files).every((f) => f !== null) &&
+    (formData.account_no || "").toString().trim() !== "" &&
+    (formData.bank_name || "").toString().trim() !== "" &&
+    (formData.bank_branch || "").toString().trim() !== "" &&
+    (formData.ifsc_code || "").toString().trim() !== "";
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!formData.first_name.trim() || !formData.last_name.trim() || !formData.email.trim() || !formData.contact.trim()) {
       alert("⚠️ Please fill in all mandatory fields: First Name, Last Name, Email, and Parent Number.");
+      return;
+    }
+    // Ensure age (if provided) is at least 6
+    const ageVal = formData.age !== "" && formData.age !== null ? Number(formData.age) : null;
+    if (ageVal !== null && !Number.isNaN(ageVal) && ageVal < 6) {
+      alert("⚠️ Age must be at least 6 years.");
       return;
     }
     if (!allUploaded) {
@@ -147,6 +160,7 @@ export default function StudentForm() {
                 type="number"
                 name="age"
                 value={formData.age}
+                min={6}
                 onChange={handleInputChange}
               />
             </label>
@@ -201,7 +215,7 @@ export default function StudentForm() {
               />
             </label>
             <label>
-              <span className="field-label">Email<span className="required">*</span></span>
+              <span className="field-label">Email( Enter Email ID for Further Communication )<span className="required">*</span></span>
               <input
                 type="email"
                 name="email"
@@ -277,7 +291,7 @@ export default function StudentForm() {
           <h2>3. Other Details</h2>
           <div className="form-group">
             <label>
-              Course / Class Fee
+              Fee
               <input 
                 type="text" 
                 name="fee" 
@@ -353,13 +367,48 @@ health
 
           <div className="upload-field">
             <span className="label">Bank Account Details</span>
-            <input
-              type="text"
-              placeholder="Enter bank account details"
-              value={bankAccount}
-              onChange={(e) => setBankAccount(e.target.value)}
-              required
-            />
+            <div className="form-group">
+              <label>
+                Account No.
+                <input
+                  type="text"
+                  name="account_no"
+                  value={formData.account_no || ""}
+                  onChange={handleInputChange}
+                  required
+                />
+              </label>
+              <label>
+                Bank Name
+                <input
+                  type="text"
+                  name="bank_name"
+                  value={formData.bank_name || ""}
+                  onChange={handleInputChange}
+                  required
+                />
+              </label>
+              <label>
+                Branch
+                <input
+                  type="text"
+                  name="bank_branch"
+                  value={formData.bank_branch || ""}
+                  onChange={handleInputChange}
+                  required
+                />
+              </label>
+              <label>
+                IFSC Code
+                <input
+                  type="text"
+                  name="ifsc_code"
+                  value={formData.ifsc_code || ""}
+                  onChange={handleInputChange}
+                  required
+                />
+              </label>
+            </div>
           </div>
 
           {renderUploadField("Fees Receipt (Upload / Text)", "fees_receipt")}
