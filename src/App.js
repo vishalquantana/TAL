@@ -33,19 +33,11 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import CoverPage from "./CoverPage";
-import LoginProfiles from "./loginProfiles";
 import RoleLogin from "./RoleLogin";
-<<<<<<< HEAD
-import VolunteerLogin from "./volunteerlogin";
-import Register from "./register";
-import StudentForm from "./studentform";
-
-=======
 import VolunteerLogin from "./volunteerlogin";  // import volunteer login
 import Register from "./register";              // import register
 import StudentForm from "./studentform";        // import student form
 import StudentDashboard from "./studentdashboard";
->>>>>>> c9069c44d261769edaf1de5381fec5a7b348344c
 
 function App() {
   return (
@@ -58,13 +50,9 @@ function App() {
         <Route path="/volunteerlogin" element={<VolunteerLogin />} />
         <Route path="/register" element={<Register />} />
 
-        {/* Student flow */}
-        <Route path="/studentform" element={<StudentForm />} />
-<<<<<<< HEAD
-  {/* StudentDocs route removed as requested */}
-=======
-        <Route path="/student-dashboard" element={<StudentDashboard />} />
->>>>>>> c9069c44d261769edaf1de5381fec5a7b348344c
+  {/* Student flow */}
+  <Route path="/studentform" element={<StudentForm />} />
+  <Route path="/student-dashboard" element={<StudentDashboard />} />
       </Routes>
     </Router>
   );

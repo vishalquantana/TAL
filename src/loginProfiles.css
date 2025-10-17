@@ -1,93 +1,9 @@
-<<<<<<< HEAD
-/* ===== Wrapper ===== */
-=======
->>>>>>> c9069c44d261769edaf1de5381fec5a7b348344c
 .profiles-wrapper {
   min-height: 100vh;
   padding: 4rem 1rem;
   display: flex;
   flex-direction: column;
   align-items: center;
-<<<<<<< HEAD
-  background: linear-gradient(135deg, #fdfbff 0%, #f9f9f9 100%);
-  font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-/* ===== Header ===== */
-.profiles-header {
-  text-align: center;
-  margin-bottom: 3.5rem;
-}
-
-.profiles-header .subtitle {
-  font-size: 0.95rem;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: #6b7280;
-  margin-bottom: 0.4rem;
-}
-
-.profiles-header h1 {
-  font-size: clamp(2rem, 5vw, 2.6rem);
-  font-weight: 700;
-  color: #111827;
-}
-
-.profiles-header h1 span {
-  color: #2563eb;
-}
-
-/* ===== Grid ===== */
-.profiles-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-  gap: 2.5rem;
-  width: 100%;
-  max-width: 1100px;
-  padding: 0 1rem;
-  justify-items: center;
-}
-
-/* ===== Card Base ===== */
-.profile-card {
-  border-radius: 22px;
-  padding: 2.5rem 1.5rem;
-  text-align: center;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.07);
-  transition: all 0.35s ease;
-  cursor: pointer;
-  position: relative;
-  color: #1e293b;
-  border: 1px solid rgba(255, 255, 255, 0.4);
-}
-
-/* ===== Pastel Colors (your palette) ===== */
-.color-1 {
-  background: linear-gradient(135deg, #c9e4de, #e8f6f3);
-}
-.color-2 {
-  background: linear-gradient(135deg, #c6def1, #e5f3fc);
-}
-.color-3 {
-  background: linear-gradient(135deg, #dbcdf0, #f2eafd);
-}
-.color-4 {
-  background: linear-gradient(135deg, #f2c6de, #ffeaf2);
-}
-
-/* ===== Staggered Layout ===== */
-.profile-card:nth-child(odd) {
-  transform: translateY(-15px);
-}
-
-.profile-card:nth-child(even) {
-  transform: translateY(15px);
-}
-
-.profile-card:hover {
-  transform: scale(1.05);
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.1);
-=======
   background: linear-gradient(135deg, #ffffff 0%, #f9f9f9 100%);
   font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
@@ -154,7 +70,6 @@
 .profile-card:hover {
   transform: translateY(-10px);
   box-shadow: 0 15px 40px rgba(140, 198, 63, 0.15);
->>>>>>> c9069c44d261769edaf1de5381fec5a7b348344c
 }
 
 /* ===== Circle Icon ===== */
@@ -168,31 +83,20 @@
   width: 90px;
   height: 90px;
   border-radius: 50%;
-<<<<<<< HEAD
-  background: linear-gradient(135deg, #2563eb, #60a5fa);
-=======
   background: linear-gradient(135deg, #8CC63F, #B6E137);
->>>>>>> c9069c44d261769edaf1de5381fec5a7b348344c
   display: flex;
   justify-content: center;
   align-items: center;
   font-size: 2.1rem;
   font-weight: 700;
   color: #fff;
-<<<<<<< HEAD
-  box-shadow: 0 6px 15px rgba(37, 99, 235, 0.25);
-=======
   box-shadow: 0 0 0 rgba(140, 198, 63, 0.4);
   animation: pulseGlow 2.5s infinite ease-in-out;
->>>>>>> c9069c44d261769edaf1de5381fec5a7b348344c
   transition: transform 0.4s ease, box-shadow 0.4s ease;
 }
 
 .profile-card:hover .circle-icon {
   transform: scale(1.1);
-<<<<<<< HEAD
-  box-shadow: 0 0 25px rgba(37, 99, 235, 0.45);
-=======
   box-shadow: 0 0 25px rgba(140, 198, 63, 0.55);
 }
 
@@ -207,7 +111,6 @@
   100% {
     box-shadow: 0 0 0 0 rgba(140, 198, 63, 0);
   }
->>>>>>> c9069c44d261769edaf1de5381fec5a7b348344c
 }
 
 /* ===== Text ===== */
