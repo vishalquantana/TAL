@@ -21,6 +21,10 @@ export default function ProfilesPage() {
       navigate('/volunteerlogin');
       return;
     }
+    if (role === 'Donor') {
+      navigate('/donorlogin');
+      return;
+    }
     // fallback: go to role-specific login
     navigate(`/login/${role.toLowerCase()}`);
   };
