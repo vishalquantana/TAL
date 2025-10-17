@@ -236,7 +236,10 @@ label .required {
 
 /* Inputs take full width of their grid cell */
 .form-group input,
-.upload-field input {
+.form-group select,
+.upload-field input,
+.upload-field select,
+.form-group textarea {
   padding: 10px;
   margin-top: 5px;
   border: 1px solid #ccc;

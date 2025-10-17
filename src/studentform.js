@@ -11,7 +11,6 @@ export default function StudentForm() {
     age: "",
     pob: "",
     nationality: "",
-    address: "",
     email: "",
     contact: "",
     whatsapp: "",
@@ -39,12 +38,7 @@ export default function StudentForm() {
     student_signature: null,
   });
 
-  const [bankAccount, setBankAccount] = useState({
-    account_no: "",
-    bank_name: "",
-    branch: "",
-    ifsc_code: ""
-  });
+  const [bankAccount, setBankAccount] = useState("");
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -58,14 +52,8 @@ export default function StudentForm() {
     }
   };
 
-  const handleBankAccountChange = (e) => {
-    const { name, value } = e.target;
-    setBankAccount({ ...bankAccount, [name]: value });
-  };
-
   const allUploaded =
-    Object.values(files).every((f) => f !== null) &&
-    Object.values(bankAccount).every((val) => val.trim() !== "");
+    Object.values(files).every((f) => f !== null) && bankAccount.trim() !== "";
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -80,9 +68,9 @@ export default function StudentForm() {
     alert("✅ Student details submitted successfully!");
   };
 
-  const renderUploadField = (label, field, required = false) => (
+  const renderUploadField = (label, field) => (
     <div className="upload-field">
-      <span className="label">{label}{required && <span className="required">*</span>}</span>
+      <span className="label">{label}</span>
       <div className="upload-controls">
         <label className="upload-btn">
           <span className="plus-icon">+</span>
@@ -160,12 +148,10 @@ export default function StudentForm() {
                 name="age"
                 value={formData.age}
                 onChange={handleInputChange}
-                min="6"
-                required
               />
             </label>
             <label>
-              Place of Birth
+              Date of Camp 
               <input
                 type="text"
                 name="pob"
@@ -174,13 +160,12 @@ export default function StudentForm() {
               />
             </label>
             <label>
-              <span className="field-label">Address<span className="required">*</span></span>
+              Address
               <input
                 type="text"
                 name="address"
-                value={formData.address}
+                value={formData.nationality}
                 onChange={handleInputChange}
-                required
               />
             </label>
           </div>
@@ -216,7 +201,7 @@ export default function StudentForm() {
               />
             </label>
             <label>
-              <span className="field-label">Email(Use one valid email ID only. Multiple IDs not allowed.)<span className="required">*</span></span>
+              <span className="field-label">Email<span className="required">*</span></span>
               <input
                 type="email"
                 name="email"
@@ -243,13 +228,25 @@ export default function StudentForm() {
               />
             </label>
             <label>
-              Which Branch
-              <input 
-                type="text" 
-                name="branch" 
-                value={formData.branch}
+              Class
+              <select
+                name="Class"
+                value={formData.Class || ""}
                 onChange={handleInputChange}
-              />
+              >
+                <option value="">Select class</option>
+                <option value="8th">8th</option>
+                <option value="9th">9th</option>
+                <option value="10th">10th</option>
+                <option value="11th">11th</option>
+                <option value="12th">12th</option>
+                <option value="B.Tech 1st Year">B.Tech 1st Year</option>
+                <option value="B.Tech 2nd Year">B.Tech 2nd Year</option>
+                <option value="B.Tech 3rd Year">B.Tech 3rd Year</option>
+                <option value="B.Tech 4th Year">B.Tech 4th Year</option>
+                <option value="B.Com">B.Com</option>
+                <option value="Other">Other</option>
+              </select>
             </label>
           </div>
 
@@ -348,63 +345,25 @@ health
         <div className="section">
           <h2>4. Document Upload</h2>
           
-          {renderUploadField("School / College ID", "school_id", true)}
-          {renderUploadField("Aadhaar Card", "aadhaar", true)}
-          {renderUploadField("Income Proof", "income_proof", true)}
-          {renderUploadField("Marks Sheet (Last & Present Year)", "marksheet", true)}
+          {renderUploadField("School / College ID", "school_id")}
+          {renderUploadField("Aadhaar Card", "aadhaar")}
+          {renderUploadField("Income Proof", "income_proof")}
+          {renderUploadField("Marks Sheet (Last & Present Year)", "marksheet")}
           {renderUploadField("Passport Size Photo", "passport_photo")}
 
-          <div className="bank-account-section">
-            <h3>Bank Account Details<span className="required">*</span></h3>
-            <div className="form-group">
-              <label>
-                Account No.<span className="required">*</span>
-                <input
-                  type="text"
-                  name="account_no"
-                  value={bankAccount.account_no}
-                  onChange={handleBankAccountChange}
-                  required
-                />
-              </label>
-              <label>
-                Bank Name<span className="required">*</span>
-                <input
-                  type="text"
-                  name="bank_name"
-                  value={bankAccount.bank_name}
-                  onChange={handleBankAccountChange}
-                  required
-                />
-              </label>
-            </div>
-            <div className="form-group">
-              <label>
-                Branch<span className="required">*</span>
-                <input
-                  type="text"
-                  name="branch"
-                  value={bankAccount.branch}
-                  onChange={handleBankAccountChange}
-                  required
-                />
-              </label>
-              <label>
-                IFSC Code<span className="required">*</span>
-                <input
-                  type="text"
-                  name="ifsc_code"
-                  value={bankAccount.ifsc_code}
-                  onChange={handleBankAccountChange}
-                  required
-                />
-              </label>
-            </div>
+          <div className="upload-field">
+            <span className="label">Bank Account Details</span>
+            <input
+              type="text"
+              placeholder="Enter bank account details"
+              value={bankAccount}
+              onChange={(e) => setBankAccount(e.target.value)}
+              required
+            />
           </div>
 
           {renderUploadField("Fees Receipt (Upload / Text)", "fees_receipt")}
-          {renderUploadField("Volunteer Signature", "volunteer_signature")}
-          {renderUploadField("Student Signature", "student_signature")}
+          
         </div>
    
         {/* Submit */}
