@@ -291,7 +291,7 @@ export default function StudentForm() {
           <h2>3. Other Details</h2>
           <div className="form-group">
             <label>
-              Fee
+              Fee Structure
               <input 
                 type="text" 
                 name="fee" 
