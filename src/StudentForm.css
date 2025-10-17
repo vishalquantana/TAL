@@ -220,6 +220,22 @@ label .required {
   color: #555;
 }
 
+/* Make certain labels span the full width of the form grid */
+.form-group label.full-width {
+  grid-column: 1 / -1;
+}
+
+/* Hide number input spinner for readonly age input */
+.readonly-age::-webkit-outer-spin-button,
+.readonly-age::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.readonly-age {
+  appearance: none;
+  -moz-appearance: textfield; /* Firefox */
+}
+
 /* Keep the field-label layout */
 .field-label {
   display: flex;

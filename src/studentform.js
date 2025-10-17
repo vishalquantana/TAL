@@ -10,7 +10,9 @@ export default function StudentForm() {
     dob: "",
     age: "",
     pob: "",
-    nationality: "",
+  nationality: "",
+  address: "",
+  Class: "",
     email: "",
     contact: "",
     whatsapp: "",
@@ -24,6 +26,9 @@ export default function StudentForm() {
     scholarship: "",
     certificates: "",
     years_area: "",
+    parents_full_names: "",
+  family_members: "",
+    earning_members: "",
     account_no: "",
     bank_name: "",
     bank_branch: "",
@@ -45,6 +50,22 @@ export default function StudentForm() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    // If DOB changes, compute age automatically
+    if (name === "dob") {
+      let computedAge = "";
+      if (value) {
+        const dobDate = new Date(value);
+        const today = new Date();
+        let ageYears = today.getFullYear() - dobDate.getFullYear();
+        const m = today.getMonth() - dobDate.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < dobDate.getDate())) {
+          ageYears--;
+        }
+        computedAge = ageYears >= 0 ? String(ageYears) : "";
+      }
+      setFormData({ ...formData, dob: value, age: computedAge });
+      return;
+    }
     setFormData({ ...formData, [name]: value });
   };
 
@@ -64,13 +85,36 @@ export default function StudentForm() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!formData.first_name.trim() || !formData.last_name.trim() || !formData.email.trim() || !formData.contact.trim()) {
-      alert("⚠️ Please fill in all mandatory fields: First Name, Last Name, Email, and Parent Number.");
+    // Mandatory fields check (as requested)
+    const mandatoryFields = [
+      { key: 'age', label: 'Age' },
+      { key: 'address', label: 'Address' },
+      { key: 'whatsapp', label: 'Whatsapp Number' },
+      { key: 'school', label: 'Name of School/College' },
+      { key: 'Class', label: 'Class' },
+      { key: 'prev_percent', label: 'Previous Year Percentage' },
+      { key: 'present_percent', label: 'Present Year Percentage' },
+      { key: 'parents_full_names', label: 'Parents Full Names' },
+      { key: 'earning_members', label: 'Earning Members' },
+      { key: 'first_name', label: 'First Name' },
+      { key: 'last_name', label: 'Last Name' },
+      { key: 'email', label: 'Email' },
+      { key: 'contact', label: 'Parent Number' }
+    ];
+
+    const missing = mandatoryFields.filter(f => {
+      const v = (formData[f.key] || '').toString().trim();
+      return v === '';
+    });
+
+    if (missing.length > 0) {
+      alert('⚠️ Please fill in all mandatory fields: ' + missing.map(m => m.label).join(', '));
       return;
     }
-    // Ensure age (if provided) is at least 6
+
+    // Ensure age is at least 6
     const ageVal = formData.age !== "" && formData.age !== null ? Number(formData.age) : null;
-    if (ageVal !== null && !Number.isNaN(ageVal) && ageVal < 6) {
+    if (ageVal === null || Number.isNaN(ageVal) || ageVal < 6) {
       alert("⚠️ Age must be at least 6 years.");
       return;
     }
@@ -83,7 +127,7 @@ export default function StudentForm() {
 
   const renderUploadField = (label, field) => (
     <div className="upload-field">
-      <span className="label">{label}</span>
+      <span className="label">{label}<span className="required">*</span></span>
       <div className="upload-controls">
         <label className="upload-btn">
           <span className="plus-icon">+</span>
@@ -93,7 +137,7 @@ export default function StudentForm() {
             onChange={(e) => handleFileChange(e, field)}
           />
         </label>
-        {files[field] && (
+          {files[field] && (
           <span className="file-info">
             <span className="tick">✓</span> {files[field].name}
           </span>
@@ -155,13 +199,15 @@ export default function StudentForm() {
               />
             </label>
             <label>
-              Age
+              <span className="field-label">Age<span className="required">*</span></span>
               <input
                 type="number"
                 name="age"
                 value={formData.age}
                 min={6}
                 onChange={handleInputChange}
+                readOnly
+                className="readonly-age"
               />
             </label>
             <label>
@@ -174,12 +220,13 @@ export default function StudentForm() {
               />
             </label>
             <label>
-              Address
+              <span className="field-label">Address<span className="required">*</span></span>
               <input
                 type="text"
                 name="address"
-                value={formData.nationality}
+                value={formData.address}
                 onChange={handleInputChange}
+                required
               />
             </label>
           </div>
@@ -197,12 +244,13 @@ export default function StudentForm() {
               </label>
 
             <label>
-              Whatsapp Number
+              <span className="field-label">Whatsapp Number<span className="required">*</span></span>
               <input
                 type="text"
                 name="whatsapp"
                 value={formData.whatsapp}
                 onChange={handleInputChange}
+                required
               />
             </label>
             <label>
@@ -215,7 +263,7 @@ export default function StudentForm() {
               />
             </label>
             <label>
-              <span className="field-label">Email( Enter Email ID for Further Communication )<span className="required">*</span></span>
+              <span className="field-label">Email (Enter Email ID For Further Communication)<span className="required">*</span></span>
               <input
                 type="email"
                 name="email"
@@ -224,15 +272,42 @@ export default function StudentForm() {
                 required
               />
             </label>
+            <label className="full-width">
+              <span className="field-label">Who all are there in the family:<span className="required">*</span></span>
+              <input
+                type="text"
+                name="family_members"
+                value={formData.family_members || ""}
+                onChange={handleInputChange}
+                required
+              />
+            </label>
+            <label className="full-width">
+              <span className="field-label">Parents Full Names<span className="required">*</span></span>
+              <input
+                type="text"
+                name="parents_full_names"
+                value={formData.parents_full_names || ""}
+                onChange={handleInputChange}
+                required
+              />
+            </label>
+            <label className="full-width">
+              <span className="field-label">Who are the earning members and what do they do?<span className="required">*</span></span>
+              <input
+                type="text"
+                name="earning_members"
+                value={formData.earning_members || ""}
+                onChange={handleInputChange}
+                required
+              />
+            </label>
           </div>
-        </div>
 
-        {/* Academic Data */}
-        <div className="section">
-          <h2>2. Academic Details</h2>
+          {/* Academic Data: School and Class */}
           <div className="form-group">
             <label>
-              Name of School and college
+              <span className="field-label">Name of School and college<span className="required">*</span></span>
               <input 
                 type="text" 
                 name="school" 
@@ -242,11 +317,12 @@ export default function StudentForm() {
               />
             </label>
             <label>
-              Class
+              <span className="field-label">Class<span className="required">*</span></span>
               <select
                 name="Class"
                 value={formData.Class || ""}
                 onChange={handleInputChange}
+                required
               >
                 <option value="">Select class</option>
                 <option value="8th">8th</option>
@@ -266,21 +342,23 @@ export default function StudentForm() {
 
           <div className="form-group">
             <label>
-             Percentage scored in previous academic year
+              <span className="field-label">Percentage scored in previous academic year<span className="required">*</span></span>
               <input 
                 type="text" 
                 name="prev_percent" 
                 value={formData.prev_percent}
                 onChange={handleInputChange}
+                required
               />
             </label>
             <label>
-              Percentage scored in present acedemic year
+              <span className="field-label">Percentage scored in present acedemic year<span className="required">*</span></span>
               <input 
                 type="text" 
                 name="present_percent" 
                 value={formData.present_percent}
                 onChange={handleInputChange}
+                required
               />
             </label>
           </div>
@@ -291,65 +369,69 @@ export default function StudentForm() {
           <h2>3. Other Details</h2>
           <div className="form-group">
             <label>
-              Fee Structure
+              <span className="field-label">Fee Structure<span className="required">*</span></span>
               <input 
                 type="text" 
                 name="fee" 
                 value={formData.fee}
                 onChange={handleInputChange}
+                required
               />
             </label>
             <label>
-             Does she work to support her family, If Yes what kind of job?
+              <span className="field-label">Does she work to support her family, If Yes what kind of job?<span className="required">*</span></span>
               <input 
                 type="text" 
                 name="job" 
                 value={formData.job}
                 onChange={handleInputChange}
+                required
               />
             </label>
           </div>
-
           <div className="form-group">
             <label>
-What are her career aspirations and planned courses for the next two years?
+              <span className="field-label">What are her career aspirations and planned courses for the next two years?<span className="required">*</span></span>
               <input 
                 type="text" 
                 name="aspiration" 
                 value={formData.aspiration}
                 onChange={handleInputChange}
+                required
               />
             </label>
             <label>
-              Is she currently getting any scholarship or Govt help or any financial assistance for her education or
-health
+              <span className="field-label">Is she currently getting any scholarship or Govt help or any financial assistance for her education or health<span className="required">*</span></span>
 
               <input 
                 type="text" 
                 name="scholarship" 
                 value={formData.scholarship}
                 onChange={handleInputChange}
+                required
               />
             </label>
           </div>
 
           <div className="form-group">
             <label>
-              Achievement Certificates
+              <span className="field-label">Achievement Certificates<span className="required">*</span></span>
               <input 
                 type="text" 
                 name="certificates" 
                 value={formData.certificates}
                 onChange={handleInputChange}
+                required
               />
             </label>
             <label>
-               From how long they living in this Area. Is she temporary living (migrant worker)?
+               <span className="field-label">From how long they living in this Area. Is she temporary living (migrant worker)?<span className="required">*</span></span>
               <input 
                 type="text" 
                 name="years_area" 
                 value={formData.years_area}
                 onChange={handleInputChange}
+                required
               />
             </label>
           </div>
@@ -369,7 +451,7 @@ health
             <span className="label">Bank Account Details</span>
             <div className="form-group">
               <label>
-                Account No.
+                <span className="field-label">Account No.<span className="required">*</span></span>
                 <input
                   type="text"
                   name="account_no"
@@ -379,7 +461,7 @@ health
                 />
               </label>
               <label>
-                Bank Name
+                <span className="field-label">Bank Name<span className="required">*</span></span>
                 <input
                   type="text"
                   name="bank_name"
@@ -389,7 +471,7 @@ health
                 />
               </label>
               <label>
-                Branch
+                <span className="field-label">Branch<span className="required">*</span></span>
                 <input
                   type="text"
                   name="bank_branch"
@@ -399,7 +481,7 @@ health
                 />
               </label>
               <label>
-                IFSC Code
+                <span className="field-label">IFSC Code<span className="required">*</span></span>
                 <input
                   type="text"
                   name="ifsc_code"
