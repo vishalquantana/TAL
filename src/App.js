@@ -7,6 +7,7 @@ import DonorLogin from "./donorlogin";
 import Register from "./register";
 import StudentForm from "./studentform";
 import StudentDashboard from "./studentdashboard";
+import DonorDashboard from "./DonorDashboard"; // <-- 1. IMPORT DonorDashboard
 
 function App() {
   return (
@@ -26,6 +27,9 @@ function App() {
         {/* Student flow */}
         <Route path="/studentform" element={<StudentForm />} />
         <Route path="/student-dashboard" element={<StudentDashboard />} />
+        
+        {/* Donor flow */}
+        <Route path="/donor-dashboard" element={<DonorDashboard />} /> {/* <-- 2. ADD NEW ROUTE */}
       </Routes>
     </Router>
   );

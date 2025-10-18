@@ -17,15 +17,19 @@ export default function ProfilesPage() {
       navigate('/student-dashboard');
       return;
     }
+    
     if (role === 'Volunteer') {
       navigate('/volunteerlogin');
       return;
     }
+    
     if (role === 'Donor') {
-      navigate('/donorlogin');
+      // CHANGE THIS LINE to navigate to the new dashboard route
+      navigate('/donor-dashboard'); 
       return;
     }
-    // fallback: go to role-specific login
+    
+    // fallback: go to role-specific login (now only for Admin)
     navigate(`/login/${role.toLowerCase()}`);
   };
 

@@ -1,98 +1,154 @@
-.cover-container {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  color: #333;
-
-  /* Combine gradient + image with fallback */
-  background: linear-gradient(135deg, #e3f2fd, #ffffff), url("https://touchalifeorg.com/wp-content/uploads/2025/05/Website-Sliders-Touch-A-Life-1080x1080-3-1.jpg") center/cover no-repeat;
+/* --- Variables --- */
+:root {
+    width: 100%;
+    --accent-green: #7FC74A;
+    --dark-text: #1d1c1d; /* Very dark text color */
+    --gray-text: #616061; /* Slack-like gray subtext */
+    --light-background: #ffffff;
+    --font-family: 'Inter', sans-serif;
 }
 
-/* Header Bar */
-.cover-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 14px 40px;
-  background: #ffffff;
-  border-bottom: 1px solid #e0e0e0;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+/* --- Container & Base --- */
+.cover-container-minimal {
+    min-height: 100vh;
+    
+    background-color: var(--light-background);
+    color: var(--dark-text);
+    font-family: var(--font-family);
+    display: flex;
+    flex-direction: column;
 }
 
-.logo {
-  height: 50px;
-  width: auto;
-  transition: transform 0.2s ease;
+/* --- Header & Navigation --- */
+.header-minimal {
+    width: 100%;
+    padding: 20px 0;
+    border-bottom: 1px solid #eee;
 }
 
-.logo:hover {
-  transform: scale(1.02);
+.header-inner-minimal {
+    width: 1450px;
+    margin: 0 auto;
+    padding: 0 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
-/* 🔹 Simplified Login Button */
-.login-btn {
-    display:inline-block;
-  padding: 6px 16px;
+/* In CoverPage.css */
+
+.logo-image-minimal {
+    height: 65px; /* Adjust height for the image */
+    width: auto;
+}
+
+.login-btn-minimal {
   width: 100px;
-  background: #4a90e2;         /* subtle blue, like many sites */
-  color: #ffffff;
-  border: none;
-  border-radius: 4px;
-  font-size: 15px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 0.25s ease, transform 0.2s ease;
-}
-
-.login-btn:hover {
-  background: #357ab8;
-  transform: translateY(-1px);
-}
-
-/* Main Content */
-.cover-main {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  padding: 0 20px;
-}
-
-.cover-main h1 {
-  font-size: 2.4rem;
-  font-weight: 700;
-  margin-bottom: 8px;
-  color: #333;
-}
-
-.cover-main h3 {
-  font-size: 1.2rem;
-  margin-bottom: 18px;
-  color: #555;
-}
-
-.cover-main p {
-  max-width: 420px;
-  color: #555;
-  line-height: 1.5;
-  font-size: 0.95rem;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .cover-header {
-    padding: 12px 20px;
-    align-items:center;
-    justify-content:space-between;
-  }
-  .login-btn {
-    padding: 6px 14px;
+    background-color: var(--dark-text);
+    color: white;
+    border: none;
+    padding: 10px 20px;
     font-size: 14px;
-  }
-  .cover-main h1 {
-    font-size: 2rem;
-  }
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.login-btn-minimal:hover {
+    background-color: var(--accent-green);
+}
+
+/* --- Hero Content --- */
+.hero-content-minimal {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 60px 20px;
+    text-align: center;
+}
+
+.eyebrow-text {
+    /* Style for the context bubble at the top */
+    background-color: #e5f5df;
+    color: var(--accent-green);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 30px;
+    display: inline-block;
+}
+
+.main-headline {
+    font-size: 64px;
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 20px;
+    max-width: 800px;
+    color: var(--dark-text);
+}
+
+.highlight-text-minimal {
+    color: var(--accent-green);
+}
+
+.cta-subtext {
+    font-size: 20px;
+    color: var(--gray-text);
+    margin-bottom: 40px;
+}
+
+/* --- CTAs --- */
+.donate-btn-minimal {
+    background-color: var(--accent-green);
+    color: white;
+    font-size: 18px;
+    font-weight: 700;
+    padding: 15px 35px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s, box-shadow 0.2s;
+    margin-bottom: 10px;
+}
+
+.donate-btn-minimal:hover {
+    background-color: #6aaa3e; 
+    box-shadow: 0 4px 10px rgba(127, 199, 74, 0.4);
+}
+
+.secondary-cta {
+    font-size: 16px;
+    color: var(--gray-text);
+}
+
+.explore-link {
+    color: var(--accent-green);
+    text-decoration: underline;
+    font-weight: 600;
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 768px) {
+    .header-inner-minimal {
+        padding: 0 20px;
+    }
+    
+    .main-headline {
+        font-size: 44px;
+        line-height: 1.2;
+    }
+
+    .cta-subtext {
+        font-size: 16px;
+        margin-bottom: 30px;
+    }
+
+    .donate-btn-minimal {
+        padding: 12px 30px;
+        font-size: 16px;
+    }
 }
