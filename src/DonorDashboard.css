@@ -1,0 +1,336 @@
+/* DonorDashboard.css */
+
+/* --- General Layout --- */
+.app-container {
+    min-height: 100vh;
+    background-color: #f7f7f7; /* Light background */
+}
+
+.dashboard-layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* --- Sidebar Styling --- */
+.sidebar {
+    width: 256px; /* 64 * 4px = 256px */
+    min-width: 256px;
+    background-color: #1D2B4A; /* Dark green */
+    color: white;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.logo-text {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 32px;
+}
+
+.nav-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #ccc;
+    text-decoration: none;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.nav-item:hover {
+    background-color: #2a686b; /* Slightly lighter green on hover */
+    color: white;
+}
+
+.nav-item.active {
+    background-color: #2a686b;
+    color: white;
+}
+
+.nav-icon {
+    margin-right: 12px;
+}
+
+.divider {
+    margin: 16px 0;
+    border: 0;
+    border-top: 1px solid #4a6c6c;
+}
+
+.support-box {
+    padding: 16px;
+    background-color: #2a686b;
+    border-radius: 12px;
+    text-align: center;
+}
+
+.support-graphic {
+    width: 100%;
+    height: 64px;
+    background-color: rgba(67, 180, 114, 0.2); /* Green with transparency */
+    border-radius: 8px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+}
+
+.support-text {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* --- Main Content Styling --- */
+.main-content {
+    flex-grow: 1;
+    padding: 32px 48px; /* 6/8 padding */
+}
+
+.main-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.page-title {
+    font-size: 28px;
+    font-weight: 600;
+    color: #333;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.user-name {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #90caf9; /* Blue placeholder */
+}
+
+/* --- Metrics Grid --- */
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-bottom: 24px;
+}
+
+/* --- Metric Card --- */
+.metric-card {
+    background-color: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    border: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.card-title {
+    font-size: 14px;
+    color: #6b7280;
+    margin-bottom: 4px;
+}
+
+.card-value {
+    font-size: 30px;
+    font-weight: bold;
+    color: #111827;
+    margin-bottom: 8px;
+}
+
+.card-change {
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.positive-change {
+    color: #10b981; /* Green */
+}
+
+.negative-change {
+    color: #ef4444; /* Red */
+}
+
+.card-icon-wrapper {
+    padding: 12px;
+    border-radius: 50%;
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.icon-green { background-color: rgba(16, 185, 129, 0.1); color: #10b981; }
+.icon-blue { background-color: rgba(59, 130, 246, 0.1); color: #3b82f6; }
+.icon-red { background-color: rgba(239, 68, 68, 0.1); color: #ef4444; }
+
+/* --- Bottom Grid --- */
+.bottom-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+}
+
+.dashboard-card {
+    background-color: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    border: 1px solid #eee;
+}
+
+.card-header-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.card-header-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+}
+
+.view-link {
+    font-size: 14px;
+    color: #6b7280;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+}
+
+.view-link-green {
+    font-size: 14px;
+    color: #10b981;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+/* --- Overview List --- */
+.overview-items {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.overview-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    background-color: #f9fafb;
+    border-radius: 8px;
+}
+
+.overview-item-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: #4b5563;
+}
+
+.overview-item-value {
+    font-size: 14px;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.positive-value {
+    background-color: #d1fae5; /* Light green */
+    color: #059669; /* Darker green */
+}
+
+/* --- Chart Styles (Total Sale Chart) --- */
+.total-sale-chart {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.chart-container {
+    position: relative;
+    width: 160px; /* 40 * 4px */
+    height: 160px;
+    margin-bottom: 24px;
+}
+
+.chart-svg {
+    transform: rotate(-90deg);
+}
+
+.chart-percentage {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.percentage-value {
+    font-size: 32px;
+    font-weight: bold;
+    color: #111827;
+}
+
+.chart-info {
+    margin-top: 16px;
+    text-align: center;
+    font-size: 14px;
+    color: #6b7280;
+}
+
+/* --- Activity Feed --- */
+.activity-feed {
+    /* No special grid layout needed, default block structure is fine */
+}
+
+.activity-item {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.activity-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-top: 6px;
+    flex-shrink: 0;
+}
+
+.dot-green { background-color: #10b981; }
+.dot-blue { background-color: #3b82f6; }
+.dot-orange { background-color: #f97316; }
+
+.activity-text {
+    font-size: 14px;
+    color: #6b7280;
+    line-height: 1.6;
+}
