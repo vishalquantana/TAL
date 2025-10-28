@@ -1,163 +1,141 @@
-// // // volunteerlogin.js
-// // import React, { useState } from "react";
-
-// // export default function VolunteerLogin() {
-// //   const [email, setEmail] = useState("");
-// //   const [password, setPassword] = useState("");
-
-// //   const handleLogin = async (e) => {
-// //     e.preventDefault();
-// //     try {
-// //       const res = await fetch("http://localhost:4000/login", {
-// //         method: "POST",
-// //         headers: { "Content-Type": "application/json" },
-// //         body: JSON.stringify({ email, password })
-// //       });
-// //       const data = await res.json();
-// //       if (data.success) {
-// //         // store volunteer_id so student form knows who added the record
-// //         localStorage.setItem("volunteer_id", data.volunteer_id);
-// //         alert("Login successful");
-// //         window.location.href = "/studentform";
-// //       } else {
-// //         alert((data.message || "Login failed"));
-// //       }
-// //     } catch (err) {
-// //       console.error("Login error:", err);
-// //       alert(" Could not reach server. Make sure backend is running.");
-// //     }
-// //   };
-
-// //   return (
-// //     <div style={{ maxWidth: 420, margin: "30px auto", padding: 20 }}>
-// //       <h2>Volunteer Login</h2>
-// //       <form onSubmit={handleLogin}>
-// //         <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} required />
-// //         <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} required />
-// //         <button type="submit">Login</button>
-// //       </form>
-// //       <p>Don't have an account? <a href="/register">Register</a></p>
-// //     </div>
-// //   );
-// // }
-
-// // volunteerlogin.js
-// import React, { useState } from "react";
-// import { useNavigate } from "react-router-dom"; // Import useNavigate
-
-// export default function VolunteerLogin() {
-//   const [email, setEmail] = useState("");
-//   const [password, setPassword] = useState("");
-//   const navigate = useNavigate(); // Initialize useNavigate
-
-//   const handleLogin = async (e) => {
-//     e.preventDefault();
-//     try {
-//       const res = await fetch("http://localhost:4000/login", {
-//         method: "POST",
-//         headers: { "Content-Type": "application/json" },
-//         body: JSON.stringify({ email, password }),
-//       });
-//       const data = await res.json();
-
-//       if (data.success && data.volunteer) {
-//         // Store the entire volunteer profile object in localStorage
-//         localStorage.setItem("volunteerProfile", JSON.stringify(data.volunteer));
-//         alert("Login successful");
-//         // Use navigate to go to the student form
-//         navigate("/studentform");
-//       } else {
-//         alert(data.message || "Login failed. Please check your credentials.");
-//       }
-//     } catch (err) {
-//       console.error("Login error:", err);
-//       alert("Could not reach the server. Please ensure the backend is running.");
-//     }
-//   };
-
-//   return (
-//     <div style={{ maxWidth: 420, margin: "30px auto", padding: 20 }}>
-//       <h2>Volunteer Login</h2>
-//       <form onSubmit={handleLogin}>
-//         <input
-//           type="email"
-//           placeholder="Email"
-//           value={email}
-//           onChange={(e) => setEmail(e.target.value)}
-//           required
-//         />
-//         <input
-//           type="password"
-//           placeholder="Password"
-//           value={password}
-//           onChange={(e) => setPassword(e.target.value)}
-//           required
-//         />
-//         <button type="submit">Login</button>
-//       </form>
-//       <p>
-//         Don't have an account? <a href="/register">Register</a>
-//       </p>
-//     </div>
-//   );
-// }
-
-// volunteerlogin.js
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-// Import the mock volunteer data from your JSON file
-import volunteerData from "./volunteer.json";
+import supabase from "./supabaseClient";
 
 export default function VolunteerLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
-    e.preventDefault(); // Prevent the form from reloading the page
+  const handleLogin = async (e) => {
+    e.preventDefault();
 
-    // Get the correct volunteer object from the imported JSON
-    const mockVolunteer = volunteerData.volunteer;
+    try {
+      const { data, error } = await supabase
+        .from("volunteers")
+        .select("*")
+        .eq("email", email)
+        .eq("password", password);
 
-    // Check if the entered email and password match the mock data
-    if (email === mockVolunteer.email && password === mockVolunteer.password) {
-      // If they match, the login is successful
-      alert("Login successful");
+      console.log("Supabase response:", { data, error });
 
-      // Store the entire volunteer profile in localStorage
-      localStorage.setItem("volunteerProfile", JSON.stringify(mockVolunteer));
-      
-      // Navigate to the student form
-      navigate("/studentform");
-    } else {
-      // If they don't match, show an error
-      alert("Invalid email or password. Please try again.");
+      if (error) {
+        alert("Error: " + error.message);
+        console.error("Supabase Error:", error);
+        return;
+      }
+
+      if (data && data.length > 0) {
+        alert("Login successful ✅");
+        localStorage.setItem("volunteerProfile", JSON.stringify(data[0]));
+        navigate("/studentform");
+      } else {
+        alert("Invalid email or password ❌");
+      }
+    } catch (err) {
+      console.error("Unexpected error:", err);
+      alert("Something went wrong. Please try again.");
     }
   };
 
   return (
-    <div style={{ maxWidth: 420, margin: "30px auto", padding: 20 }}>
-      <h2>Volunteer Login</h2>
-      <form onSubmit={handleLogin}>
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-        <button type="submit">Login</button>
-      </form>
-      <p>
-        Don't have an account? <a href="/register">Register</a>
-      </p>
+    <div
+      style={{
+        height: "100vh",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        background: "linear-gradient(to bottom right, #f7f9fc, #e3ecf5)",
+      }}
+    >
+      <div
+        style={{
+          width: "360px",
+          padding: "25px 20px",
+          borderRadius: "12px",
+          backgroundColor: "#fff",
+          boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+        }}
+      >
+        <h2
+          style={{
+            textAlign: "center",
+            marginBottom: "18px",
+            color: "#333",
+            fontSize: "1.4rem",
+          }}
+        >
+          Volunteer Login
+        </h2>
+
+        <form onSubmit={handleLogin}>
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            style={{
+              width: "100%",
+              padding: "9px",
+              marginBottom: "12px",
+              border: "1px solid #ccc",
+              borderRadius: "6px",
+              fontSize: "0.95rem",
+            }}
+          />
+
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            style={{
+              width: "100%",
+              padding: "9px",
+              marginBottom: "18px",
+              border: "1px solid #ccc",
+              borderRadius: "6px",
+              fontSize: "0.95rem",
+            }}
+          />
+
+          <button
+            type="submit"
+            style={{
+              width: "100%",
+              backgroundColor: "#cdcfbdff",
+              color: "#fff",
+              padding: "10px",
+              border: "none",
+              borderRadius: "6px",
+              cursor: "pointer",
+              fontWeight: "bold",
+              fontSize: "1rem",
+            }}
+          >
+            Login
+          </button>
+        </form>
+
+        <p
+          style={{
+            textAlign: "center",
+            marginTop: "14px",
+            fontSize: "0.9rem",
+            color: "#555555ff",
+          }}
+        >
+          Don’t have an account?{" "}
+          <a
+            href="/register"
+            style={{ color: "#007bff", textDecoration: "none", fontWeight: 500 }}
+          >
+            Register
+          </a>
+        </p>
+      </div>
     </div>
   );
 }

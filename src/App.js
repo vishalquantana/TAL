@@ -1,5 +1,7 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import supabase from "./supabaseClient";
+import {testConnection } from "./testSupabase";
 import CoverPage from "./CoverPage";
 import LoginProfiles from "./loginProfiles";
 import VolunteerLogin from "./volunteerlogin";
