@@ -1,5 +1,6 @@
 import React from 'react';
-import { Home, Users, Settings, LogOut, DollarSign, BookOpen, Heart, ChevronDown } from 'lucide-react'; 
+import { useNavigate } from 'react-router-dom';
+import { Home, Users, Settings, LogOut, DollarSign, BookOpen, Heart, ChevronDown } from 'lucide-react';
 import './DonorDashboard.css'; // Import the new CSS file
 
 // --- Data Definitions (Unchanged) ---
@@ -30,7 +31,7 @@ const ACTIVITY_DATA = [
 
 // --- Sub-Components (Styled with Classes) ---
 
-const Sidebar = () => (
+const Sidebar = ({ navigate }) => (
     <aside className="sidebar">
         <div>
             <h1 className="logo-text">Touch A Life</h1>
@@ -50,7 +51,7 @@ const Sidebar = () => (
                         {item.name}
                     </a>
                 ))}
-                <a href="#" className="nav-item">
+                <a onClick={() => navigate('/login')} className="nav-item" style={{cursor: 'pointer'}}>
                     <LogOut size={18} className="nav-icon" />
                     Quit
                 </a>
@@ -147,12 +148,14 @@ const TotalSaleChart = () => {
 
 // Main Dashboard Component
 const DonorDashboard = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="app-container">
       <div className="dashboard-layout">
-        
-        <Sidebar />
-        
+
+        <Sidebar navigate={navigate} />
+
         <main className="main-content">
           <header className="main-header">
             <h1 className="page-title">Donor Impact Dashboard</h1>
