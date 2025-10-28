@@ -24,8 +24,7 @@ export default function ProfilesPage() {
     }
     
     if (role === 'Donor') {
-      // CHANGE THIS LINE to navigate to the new dashboard route
-      navigate('/donor-dashboard'); 
+      navigate('/donorlogin');
       return;
     }
     
