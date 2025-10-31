@@ -14,7 +14,7 @@ export default function ProfilesPage() {
 
   const handleClick = (role) => {
     if (role === 'Student') {
-      navigate('/student-dashboard');
+      navigate('/student-login'); 
       return;
     }
     

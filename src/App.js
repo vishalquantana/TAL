@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import supabase from "./supabaseClient";
 import {testConnection } from "./testSupabase";
 import CoverPage from "./CoverPage";
+import StudentLogin from "./studentlogin";
 import LoginProfiles from "./loginProfiles";
 import VolunteerLogin from "./volunteerlogin";
 import DonorLogin from "./donorlogin";
@@ -28,6 +29,7 @@ function App() {
 
         {/* Student flow */}
         <Route path="/studentform" element={<StudentForm />} />
+        <Route path="/student-login" element={<StudentLogin />} />
         <Route path="/student-dashboard" element={<StudentDashboard />} />
         
         {/* Donor flow */}
