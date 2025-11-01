@@ -131,7 +131,7 @@ export default function CoverPage() {
     if (role === 'Volunteer') {
       navigate('/volunteerlogin');
     } else if (role === 'Student') {
-      navigate('/studentlogin');
+      navigate('/student-dashboard');
     } else if (role === 'Donor') {
       navigate('/donorlogin');
     } else if (role === 'Admin') {

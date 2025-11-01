@@ -7,11 +7,9 @@ const StudentDashboard = () => {
   const navigate = useNavigate();
 
   const handleLogout = async () => {
-  await supabase.auth.signOut();
-  // Navigate to coverpage and replace history so back button can't return to dashboard
-  navigate("/CoverPage", { replace: true });
-};
-
+    await supabase.auth.signOut();
+    navigate("/student-login");
+  };
 
   const [student] = useState({
     name: "Katie Johnson",

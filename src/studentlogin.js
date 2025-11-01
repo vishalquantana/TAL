@@ -56,7 +56,14 @@ export default function StudentLogin() {
     }
   };
 
-  
+  // ✅ Google Sign-In
+  const handleGoogleSignIn = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: window.location.origin + "/student-dashboard" },
+    });
+    if (error) toast.error(error.message);
+  };
 
   return (
     <div className="auth-container">
@@ -95,12 +102,14 @@ export default function StudentLogin() {
 
         <div className="divider">or</div>
 
-        
+        <button className="google-btn" onClick={handleGoogleSignIn}>
+          Continue with Google
+        </button>
 
         <p className="switch-text">
           {isSignIn ? "New here?" : "Already have an account?"}{" "}
           <span onClick={() => setIsSignIn(!isSignIn)}>
-            {isSignIn ? "Register" : "Sign in"}
+            {isSignIn ? "Create an account" : "Sign in"}
           </span>
         </p>
       </div>

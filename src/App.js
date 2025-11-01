@@ -17,7 +17,7 @@ function App() {
     <Router>
       <Routes>
         {/* Cover page shows first */}
-        <Route path="/CoverPage" element={<CoverPage />} />
+        <Route path="/" element={<CoverPage />} />
 
         {/* Login profiles page */}
         <Route path="/login" element={<LoginProfiles />} />
@@ -29,7 +29,7 @@ function App() {
 
         {/* Student flow */}
         <Route path="/studentform" element={<StudentForm />} />
-        <Route path="/studentlogin" element={<StudentLogin />} />
+        <Route path="/student-login" element={<StudentLogin />} />
         <Route path="/student-dashboard" element={<StudentDashboard />} />
         
         {/* Donor flow */}
