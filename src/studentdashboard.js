@@ -8,7 +8,7 @@ const StudentDashboard = () => {
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    navigate("/student-login");
+    navigate("/");
   };
 
   const [student] = useState({

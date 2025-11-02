@@ -1,12 +1,12 @@
-// src/StudentLogin.js
+// src/VolunteerLogin.js
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import supabase from "./supabaseClient";
-import "./studentlogin.css";
+import "./studentlogin.css"; // you can keep same styling or rename later
 
-export default function StudentLogin() {
+export default function VolunteerLogin() {
   const [isSignIn, setIsSignIn] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -19,7 +19,7 @@ export default function StudentLogin() {
     const checkSession = async () => {
       const { data } = await supabase.auth.getSession();
       if (data.session) {
-        navigate("/studentform");
+        navigate("/studentform"); // 👈 volunteer dashboard route
       } else {
         setLoading(false);
       }
@@ -35,20 +35,29 @@ export default function StudentLogin() {
 
     try {
       if (isSignIn) {
+        // VOLUNTEER SIGN-IN
         const { data, error } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
         if (error) throw error;
+
         toast.success("Signed in successfully!");
         navigate("/studentform");
       } else {
+        // VOLUNTEER SIGN-UP 👇 (important)
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
-          options: { data: { name } },
+          options: {
+            data: {
+              name,
+              user_type: "volunteer", // 👈 this tells Supabase to put user in volunteers table
+            },
+          },
         });
         if (error) throw error;
+
         toast.success("Account created successfully!");
       }
     } catch (err) {
@@ -60,7 +69,9 @@ export default function StudentLogin() {
   const handleGoogleSignIn = async () => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: window.location.origin + "/student-dashboard" },
+      options: {
+        redirectTo: window.location.origin + "/student-dashboard", // 👈 volunteer dashboard route
+      },
     });
     if (error) toast.error(error.message);
   };
@@ -68,7 +79,7 @@ export default function StudentLogin() {
   return (
     <div className="auth-container">
       <div className="auth-box">
-        <h1>{isSignIn ? "Sign In" : "Sign Up"}</h1>
+        <h1>{isSignIn ? "Volunteer Sign In" : "Volunteer Sign Up"}</h1>
 
         <form onSubmit={handleSubmit}>
           {!isSignIn && (

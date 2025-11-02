@@ -18,7 +18,7 @@ function App() {
     <Router>
       <Routes>
         {/* Cover page shows first */}
-        <Route path="/CoverPage" element={<CoverPage />} />
+        <Route path="/" element={<CoverPage />} />
 
         {/* Login profiles page */}
         <Route path="/login" element={<LoginProfiles />} />

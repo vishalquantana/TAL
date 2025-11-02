@@ -18,7 +18,7 @@ export default function VolunteerProfile() {
         setEmail(user.email || "");
       } else {
         console.log("No logged-in user detected. Redirecting to /cover");
-        navigate("/cover"); // redirect if no user
+        navigate("/"); // redirect if no user
       }
     };
     fetchUser();
@@ -29,7 +29,7 @@ export default function VolunteerProfile() {
     if (error) console.log("Logout error:", error);
     else console.log("Logged out successfully");
 
-    navigate("/CoverPage"); // redirect to cover page after logout
+    navigate("/"); // redirect to cover page after logout
   };
 
   return (
