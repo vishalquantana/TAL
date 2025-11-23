@@ -11,9 +11,10 @@ export default function StudentForm() {
     dob: "",
     age: "",
     pob: "",
-  nationality: "",
-  address: "",
-  Class: "",
+    camp_name: "", // added (no UI layout changes)
+    nationality: "",
+    address: "",
+    Class: "",
     email: "",
     contact: "",
     whatsapp: "",
@@ -28,12 +29,13 @@ export default function StudentForm() {
     certificates: "",
     years_area: "",
     parents_full_names: "",
-  family_members: "",
+    family_members: "",
     earning_members: "",
     account_no: "",
     bank_name: "",
     bank_branch: "",
-    ifsc_code: ""
+    ifsc_code: "",
+    special_remarks: "" // added (no UI layout changes)
   });
 
   // State for file uploads
@@ -47,7 +49,6 @@ export default function StudentForm() {
     volunteer_signature: null,
     student_signature: null,
   });
-
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -77,12 +78,8 @@ export default function StudentForm() {
     }
   };
 
-  const allUploaded =
-    Object.values(files).every((f) => f !== null) &&
-    (formData.account_no || "").toString().trim() !== "" &&
-    (formData.bank_name || "").toString().trim() !== "" &&
-    (formData.bank_branch || "").toString().trim() !== "" &&
-    (formData.ifsc_code || "").toString().trim() !== "";
+  // NOTE: document uploads are now OPTIONAL.
+  // Removed allUploaded check and submission-blocking behavior.
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -119,16 +116,16 @@ export default function StudentForm() {
       alert("⚠️ Age must be at least 6 years.");
       return;
     }
-    if (!allUploaded) {
-      alert("⚠️ Please upload all required documents before submitting.");
-      return;
-    }
+
+    // Do NOT block submit if uploads are missing (uploads optional)
     alert("✅ Student details submitted successfully!");
   };
 
   const renderUploadField = (label, field) => (
     <div className="upload-field">
-      <span className="label">{label}<span className="required">*</span></span>
+      {/* Kept same classes and structure to preserve UI.
+          Removed required '*' from upload label so visually uploads look optional. */}
+      <span className="label">{label}</span>
       <div className="upload-controls">
         <label className="upload-btn">
           <span className="plus-icon">+</span>
@@ -138,7 +135,7 @@ export default function StudentForm() {
             onChange={(e) => handleFileChange(e, field)}
           />
         </label>
-          {files[field] && (
+        {files[field] && (
           <span className="file-info">
             <span className="tick">✓</span> {files[field].name}
           </span>
@@ -221,6 +218,18 @@ export default function StudentForm() {
                 onChange={handleInputChange}
               />
             </label>
+
+            {/* Inserted here immediately after Date of Camp; style & placement identical */}
+            <label>
+              Name of Camp
+              <input
+                type="text"
+                name="camp_name"
+                value={formData.camp_name}
+                onChange={handleInputChange}
+              />
+            </label>
+
             <label>
               <span className="field-label">Address<span className="required">*</span></span>
               <input
@@ -504,8 +513,22 @@ health
         </div>
    
         {/* Submit */}
+
+        {/* Added Special Remarks section exactly styled like other .section blocks */}
+        <div className="section">
+          <h2>5. Special Remarks</h2>
+          <textarea
+            name="special_remarks"
+            value={formData.special_remarks}
+            onChange={handleInputChange}
+            placeholder="Any additional notes or comments"
+            rows={4}
+            style={{ width: "100%" }}
+          ></textarea>
+        </div>
+
         <div className="submit-container">
-          <button type="submit" disabled={!allUploaded}>
+          <button type="submit">
             Submit Application
           </button>
         </div>
