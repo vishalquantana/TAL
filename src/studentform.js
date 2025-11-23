@@ -324,7 +324,7 @@ export default function StudentForm() {
           <h2>2. Academic Data</h2>
           <div className="form-group">
             <label>
-              <span className="field-label">Name of School and college<span className="required">*</span></span>
+              <span className="field-label">Name of School/College<span className="required">*</span></span>
               <input 
                 type="text" 
                 name="school" 
