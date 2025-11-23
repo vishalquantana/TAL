@@ -2,12 +2,56 @@ import React, { useMemo, useState } from "react";
 import "./AdminDashboard.css";
 
 export default function AdminDashboard() {
-  // Dummy data
+  // Dummy data (now includes campName, campDate, course, paidDate)
   const [students, setStudents] = useState([
-    { id: 1, name: "Asha Devi", college: "Govt College", year: "1st", donor: "Rajesh", feeStatus: "Paid" },
-    { id: 2, name: "Rahul Kumar", college: "City PU College", year: "2nd", donor: "None", feeStatus: "Pending" },
-    { id: 3, name: "Meera Singh", college: "State College", year: "3rd", donor: "ABC Trust", feeStatus: "Partial" },
-    { id: 4, name: "Vikram Patel", college: "Tech Institute", year: "4th", donor: "XYZ Corp", feeStatus: "Paid" },
+    {
+      id: 1,
+      name: "Asha Devi",
+      college: "Govt College",
+      year: "1st",
+      donor: "Rajesh",
+      feeStatus: "Paid",
+      campName: "Health Camp A",
+      campDate: "2025-03-12",
+      course: "Science",
+      paidDate: "2025-03-15"
+    },
+    {
+      id: 2,
+      name: "Rahul Kumar",
+      college: "City PU College",
+      year: "2nd",
+      donor: "None",
+      feeStatus: "Pending",
+      campName: "Education Drive B",
+      campDate: "2025-04-20",
+      course: "Commerce",
+      paidDate: ""
+    },
+    {
+      id: 3,
+      name: "Meera Singh",
+      college: "State College",
+      year: "3rd",
+      donor: "ABC Trust",
+      feeStatus: "Partial",
+      campName: "Awareness Camp C",
+      campDate: "2024-12-05",
+      course: "Arts",
+      paidDate: "2025-02-10"
+    },
+    {
+      id: 4,
+      name: "Vikram Patel",
+      college: "Tech Institute",
+      year: "4th",
+      donor: "XYZ Corp",
+      feeStatus: "Paid",
+      campName: "Tech Outreach D",
+      campDate: "2025-01-18",
+      course: "Engineering",
+      paidDate: "2025-01-20"
+    },
   ]);
 
   const [donors, setDonors] = useState([
@@ -17,7 +61,8 @@ export default function AdminDashboard() {
   ]);
   const [viewDonor, setViewDonor] = useState(null);
 
-  const [filters, setFilters] = useState({ class: "", donor: "", feeStatus: "" });
+  // filters now include stream (course)
+  const [filters, setFilters] = useState({ class: "", donor: "", feeStatus: "", stream: "" });
   const [query, setQuery] = useState("");
 
   const [activeSection, setActiveSection] = useState("overview");
@@ -35,29 +80,49 @@ export default function AdminDashboard() {
     return { totalStudents, feesCollected, pendingFees, activeDonors };
   }, [students, donors]);
 
+  // filteredStudents takes stream/course into account
   const filteredStudents = useMemo(() => {
     return students.filter((s) => {
       if (filters.class && s.year !== filters.class) return false;
-      if (filters.donor && (filters.donor === "None" ? s.donor !== "None" : s.donor !== filters.donor)) return false;
+      if (filters.donor) {
+        // When "None" is selected, show students with donor "None"
+        if (filters.donor === "None") {
+          if (s.donor !== "None") return false;
+        } else {
+          if (s.donor !== filters.donor) return false;
+        }
+      }
       if (filters.feeStatus && s.feeStatus !== filters.feeStatus) return false;
+      if (filters.stream && s.course !== filters.stream) return false;
       if (query && !`${s.name} ${s.college}`.toLowerCase().includes(query.toLowerCase())) return false;
       return true;
     });
   }, [students, filters, query]);
 
-  // handlers
+  // helpers
+  const uniqueCourses = useMemo(() => {
+    const set = new Set();
+    students.forEach(s => s.course && set.add(s.course));
+    return Array.from(set);
+  }, [students]);
+
   const handleDelete = (id) => {
     if (!window.confirm("Delete this student record?")) return;
     setStudents((prev) => prev.filter((p) => p.id !== id));
   };
 
   const handleEditSave = (data) => {
-    setStudents((prev) => prev.map((p) => (p.id === data.id ? data : p)));
+    // Data contains id + updated fields
+    setStudents((prev) => prev.map((p) => (p.id === data.id ? { ...p, ...data } : p)));
     setEditStudent(null);
   };
 
   const exportCSV = () => {
-    const rows = ["id,name,college,year,donor,feeStatus", ...students.map(s => `${s.id},${s.name},${s.college},${s.year},${s.donor},${s.feeStatus}`)];
+    // include new fields campName,campDate,course,paidDate
+    const rows = [
+      "id,name,college,year,donor,feeStatus,course,campName,campDate,paidDate",
+      ...students.map(s => `${s.id},"${s.name}","${s.college}",${s.year},${s.donor},${s.feeStatus},${s.course || ""},"${s.campName || ""}",${s.campDate || ""},${s.paidDate || ""}`)
+    ];
     const blob = new Blob([rows.join("\n")], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -100,7 +165,12 @@ export default function AdminDashboard() {
   };
 
   const handleDownloadFeeReport = () => {
-    const rows = ['id,name,total,paid,balance', ...students.map(s => `${s.id},${s.name},5000,${s.feeStatus === 'Paid' ? 5000 : s.feeStatus === 'Partial' ? 2500 : 0},${s.feeStatus === 'Paid' ? 0 : s.feeStatus === 'Partial' ? 2500 : 5000}`)];
+    const rows = ['id,name,total,paid,balance,paidDate', ...students.map(s => {
+      const total = 5000;
+      const paid = s.feeStatus === 'Paid' ? 5000 : s.feeStatus === 'Partial' ? 2500 : 0;
+      const balance = total - paid;
+      return `${s.id},"${s.name}",${total},${paid},${balance},${s.paidDate || ""}`;
+    })];
     const blob = new Blob([rows.join('\n')], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -116,7 +186,9 @@ export default function AdminDashboard() {
   };
 
   const handleRecordPayment = (studentId) => {
-    setStudents(prev => prev.map(p => p.id === studentId ? { ...p, feeStatus: 'Paid' } : p));
+    const today = new Date();
+    const iso = today.toISOString().split('T')[0]; // YYYY-MM-DD
+    setStudents(prev => prev.map(p => p.id === studentId ? { ...p, feeStatus: 'Paid', paidDate: iso } : p));
     alert('Marked as Paid (demo)');
   };
 
@@ -140,6 +212,11 @@ export default function AdminDashboard() {
 
   const handleSaveSettings = () => {
     alert('Settings saved (demo)');
+  };
+
+  // When opening edit modal, create a shallow copy so editing doesn't mutate state directly
+  const openEditModal = (s) => {
+    setEditStudent({ ...s });
   };
 
   return (
@@ -308,18 +385,27 @@ export default function AdminDashboard() {
                     <option>3rd</option>
                     <option>4th</option>
                   </select>
+
                   <select value={filters.donor} onChange={(e) => setFilters(f => ({...f, donor: e.target.value}))}>
                     <option value="">All Donors</option>
                     <option>None</option>
                     {donors.map(d => <option key={d.id} value={d.name}>{d.name}</option>)}
                   </select>
+
                   <select value={filters.feeStatus} onChange={(e) => setFilters(f => ({...f, feeStatus: e.target.value}))}>
                     <option value="">All Fee Status</option>
                     <option>Paid</option>
                     <option>Partial</option>
                     <option>Pending</option>
                   </select>
+
+                  {/* NEW: Stream / Course filter */}
+                  <select value={filters.stream} onChange={(e) => setFilters(f => ({...f, stream: e.target.value}))}>
+                    <option value="">All Streams</option>
+                    {uniqueCourses.map((c, idx) => <option key={idx} value={c}>{c}</option>)}
+                  </select>
                 </div>
+
                 <div className="manage-actions">
                   <button className="btn" onClick={exportCSV}>Export CSV</button>
                 </div>
@@ -334,6 +420,8 @@ export default function AdminDashboard() {
                       <th>Year</th>
                       <th>Donor</th>
                       <th>Fee Status</th>
+                      <th>Course</th>         {/* NEW column (stream) */}
+                      <th>Camp</th>           {/* NEW column (campName / campDate) */}
                       <th>Actions</th>
                     </tr>
                   </thead>
@@ -345,9 +433,16 @@ export default function AdminDashboard() {
                         <td>{s.year}</td>
                         <td>{s.donor}</td>
                         <td>{s.feeStatus}</td>
+                        <td>{s.course}</td>
+                        <td>
+                          <div style={{whiteSpace: 'nowrap'}}>
+                            <div>{s.campName}</div>
+                            <div style={{fontSize: '0.85em', color: '#666'}}>{s.campDate}</div>
+                          </div>
+                        </td>
                         <td>
                           <button className="btn small" onClick={() => setViewStudent(s)}>View Profile</button>
-                          <button className="btn small" onClick={() => setEditStudent(s)}>Edit</button>
+                          <button className="btn small" onClick={() => openEditModal(s)}>Edit</button>
                           <button className="btn small danger" onClick={() => handleDelete(s.id)}>Delete</button>
                         </td>
                       </tr>
@@ -450,6 +545,7 @@ export default function AdminDashboard() {
                       <th>Total Fee</th>
                       <th>Paid Amount</th>
                       <th>Due Date</th>
+                      <th>Paid Date</th> {/* NEW */}
                       <th>Status</th>
                       <th>Actions</th>
                     </tr>
@@ -461,6 +557,7 @@ export default function AdminDashboard() {
                         <td>₹5,000</td>
                         <td>₹{s.feeStatus === 'Paid' ? '5,000' : s.feeStatus === 'Partial' ? '2,500' : '0'}</td>
                         <td>Nov 30, 2025</td>
+                        <td>{s.paidDate ? s.paidDate : "-"}</td> {/* show paidDate */}
                         <td>
                           <span className={`status-badge ${s.feeStatus.toLowerCase()}`}>
                             {s.feeStatus}
@@ -648,6 +745,10 @@ export default function AdminDashboard() {
             <p><strong>College:</strong> {viewStudent.college}</p>
             <p><strong>Year:</strong> {viewStudent.year}</p>
             <p><strong>Donor:</strong> {viewStudent.donor}</p>
+            <p><strong>Course:</strong> {viewStudent.course}</p>
+            <p><strong>Camp:</strong> {viewStudent.campName} ({viewStudent.campDate})</p>
+            <p><strong>Fee Status:</strong> {viewStudent.feeStatus}</p>
+            <p><strong>Paid Date:</strong> {viewStudent.paidDate || '-'}</p>
             <button className="btn" onClick={() => setViewStudent(null)}>Close</button>
           </div>
         </div>
@@ -672,12 +773,46 @@ export default function AdminDashboard() {
         <div className="modal-overlay" onClick={() => setEditStudent(null)}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
             <h3>Edit Student</h3>
-            <form onSubmit={(e) => { e.preventDefault(); const fd = new FormData(e.target); handleEditSave({ id: editStudent.id, name: fd.get('name'), college: fd.get('college'), year: fd.get('year'), donor: fd.get('donor'), feeStatus: fd.get('feeStatus') }); }}>
+            {/* Edit form includes new fields: course, campName, campDate, paidDate */}
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              const fd = new FormData(e.target);
+              const updated = {
+                id: editStudent.id,
+                name: fd.get('name'),
+                college: fd.get('college'),
+                year: fd.get('year'),
+                donor: fd.get('donor'),
+                feeStatus: fd.get('feeStatus'),
+                course: fd.get('course'),
+                campName: fd.get('campName'),
+                campDate: fd.get('campDate'),
+                paidDate: fd.get('paidDate') || ""
+              };
+              handleEditSave(updated);
+            }}>
               <label>Name<input name="name" defaultValue={editStudent.name} /></label>
               <label>College<input name="college" defaultValue={editStudent.college} /></label>
               <label>Year<input name="year" defaultValue={editStudent.year} /></label>
               <label>Donor<input name="donor" defaultValue={editStudent.donor} /></label>
-              <label>Fee Status<select name="feeStatus" defaultValue={editStudent.feeStatus}><option>Paid</option><option>Partial</option><option>Pending</option></select></label>
+
+              <label>Course
+                <input name="course" defaultValue={editStudent.course || ""} placeholder="e.g. Science, Commerce" />
+              </label>
+
+              <label>Camp Name<input name="campName" defaultValue={editStudent.campName || ""} /></label>
+              <label>Camp Date<input name="campDate" defaultValue={editStudent.campDate || ""} placeholder="YYYY-MM-DD" /></label>
+
+              <label>Paid Date<input name="paidDate" defaultValue={editStudent.paidDate || ""} placeholder="YYYY-MM-DD" /></label>
+
+              <label>Fee Status
+                <select name="feeStatus" defaultValue={editStudent.feeStatus}>
+                  <option>Paid</option>
+                  <option>Partial</option>
+                  <option>Pending</option>
+                </select>
+              </label>
+
               <div style={{display:'flex',gap:8,marginTop:12}}>
                 <button className="btn" type="submit">Save</button>
                 <button className="btn" type="button" onClick={() => setEditStudent(null)}>Cancel</button>
