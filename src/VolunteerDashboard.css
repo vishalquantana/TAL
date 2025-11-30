@@ -103,31 +103,47 @@ body, html, #root, .volunteer-dashboard {
 .main-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   padding-bottom: 20px;
   border-bottom: 1px solid rgba(0,0,0,0.08);
+  gap: 20px;
 }
 
 .main-header h1 {
-  margin: 0;
+  margin: 0 0 6px 0;
   color: var(--primary-color);
   font-weight: 600;
   font-size: 24px;
 }
 
+.main-header p {
+  margin: 0;
+  color: #343232;
+  font-size: 0.95rem;
+}
+
 .fill-form-btn {
-  padding: 12px 16px;
-  background-color: var(--secondary-color);
+  padding: 10px 24px;
+  background-color: #3b82f6;
   border: none;
-  border-radius: var(--border-radius);
+  border-radius: 50px;
   color: white;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color var(--transition-speed);
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
 }
 
 .fill-form-btn:hover {
-  background-color: #235557;
+  background-color: #2563eb;
+  transform: scale(1.05);
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.4);
 }
 
 .forms-table {
