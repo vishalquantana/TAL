@@ -161,13 +161,3 @@ button[type="submit"]:hover {
     background: #0e4b4f;
 }
 
-.input-error {
-  border: 2px solid red !important;
-}
-
-.error-text {
-  color: red;
-  font-size: 0.8rem;
-  margin-top: 2px;
-}
-
