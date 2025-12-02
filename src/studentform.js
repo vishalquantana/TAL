@@ -13,29 +13,29 @@ import supabase from "./supabaseClient";
 
 export default function StudentForm() {
   const [volunteerEmail, setVolunteerEmail] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");  
+  const [successMessage, setSuccessMessage] = useState("");
+  const [errors, setErrors] = useState({}); // <-- validation errors
 
   useEffect(() => {
-  // fetch logged-in user email (volunteer)
-  const getUser = async () => {
-    try {
-      const { data, error } = await supabase.auth.getUser();
-      if (error) {
-        console.warn("supabase.auth.getUser error:", error);
-        return;
+    // fetch logged-in user email (volunteer)
+    const getUser = async () => {
+      try {
+        const { data, error } = await supabase.auth.getUser();
+        if (error) {
+          console.warn("supabase.auth.getUser error:", error);
+          return;
+        }
+        if (data?.user) {
+          setVolunteerEmail(data.user.email);
+          // REMOVE this line — no user_id in your table
+          // setFormData(prevData => ({ ...prevData, user_id: data.user.id }));
+        }
+      } catch (err) {
+        console.error("getUser error:", err);
       }
-      if (data?.user) {
-        setVolunteerEmail(data.user.email);
-        // REMOVE this line — no user_id in your table
-        // setFormData(prevData => ({ ...prevData, user_id: data.user.id }));
-      }
-    } catch (err) {
-      console.error("getUser error:", err);
-    }
-  };
-  getUser();
-}, []);
-
+    };
+    getUser();
+  }, []);
 
   const [formData, setFormData] = useState({
     first_name: "",
@@ -108,9 +108,84 @@ export default function StudentForm() {
     "Other"
   ];
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
+  // Helper: validate a single field and return error message (or empty string)
+  const validateField = (name, value) => {
+    // Phone fields (exactly 10 digits)
+    if (name === "contact" || name === "whatsapp") {
+      if (!value || !/^\d{10}$/.test(value)) {
+        return "Must be exactly 10 digits";
+      }
+      return "";
+    }
 
+    // Student number (optional, but if present must be 10 digits)
+    if (name === "student_contact") {
+      if (!value) return "";
+      if (!/^\d{10}$/.test(value)) return "Must be exactly 10 digits (if entered)";
+      return "";
+    }
+
+    // Account number: digits only, 10-18 digits
+    if (name === "account_no") {
+      if (!value || !/^\d{10,18}$/.test(value)) {
+        return "Account number must be 10 to 18 digits";
+      }
+      return "";
+    }
+
+    // IFSC: 4 letters + 0 + 6 alnum (common pattern)
+    // We'll enforce uppercase letters automatically in handleInputChange
+    if (name === "ifsc_code") {
+      if (!value || !/^[A-Z]{4}0[A-Z0-9]{6}$/.test(value)) {
+        return "IFSC must be 4 letters, '0', then 6 characters (e.g. HDFC0001234)";
+      }
+      return "";
+    }
+
+    // Email simple check
+    if (name === "email") {
+      if (!value) return "Email is required";
+      if (!/^\S+@\S+\.\S+$/.test(value)) return "Enter a valid email";
+      return "";
+    }
+
+    // Age check (already handled at submit) - but live ensure age >= 6 if present
+    if (name === "age") {
+      if (value !== "" && (Number.isNaN(Number(value)) || Number(value) < 6)) {
+        return "Age must be at least 6";
+      }
+      return "";
+    }
+
+    return "";
+  };
+
+  // handleInputChange: extended to enforce digit-only and other live rules for specific fields
+  const handleInputChange = (e) => {
+    const { name } = e.target;
+    let { value } = e.target;
+
+    // PHONE FIELDS: block non-digits and limit to 10
+    if (["contact", "whatsapp", "student_contact"].includes(name)) {
+      // remove non-digits
+      value = value.replace(/\D/g, "");
+      // limit length to 10 digits
+      if (value.length > 10) value = value.slice(0, 10);
+    }
+
+    // ACCOUNT NUMBER: digits only, limit to 18
+    if (name === "account_no") {
+      value = value.replace(/\D/g, "");
+      if (value.length > 18) value = value.slice(0, 18);
+    }
+
+    // IFSC: auto uppercase, allow letters/digits, limit to 11 (standard length)
+    if (name === "ifsc_code") {
+      value = value.toUpperCase().replace(/[^A-Z0-9]/g, "");
+      if (value.length > 11) value = value.slice(0, 11);
+    }
+
+    // DOB handling (existing logic preserved)
     if (name === "dob") {
       let computedAge = "";
       if (value) {
@@ -123,25 +198,30 @@ export default function StudentForm() {
         }
         computedAge = ageYears >= 0 ? String(ageYears) : "";
       }
-      setFormData({ ...formData, dob: value, age: computedAge });
+      setFormData(prev => ({ ...prev, dob: value, age: computedAge }));
+      // validate dob/age live
+      setErrors(prev => ({ ...prev, age: validateField("age", computedAge) }));
       return;
     }
 
-    // Handle education category change
+    // Education category/year handling preserved
     if (name === "educationCategory") {
-      setFormData({ ...formData, educationCategory: value, educationYear: "" });
+      setFormData(prev => ({ ...prev, educationCategory: value, educationYear: "" }));
       return;
     }
 
-    // Handle education year change
     if (name === "educationYear") {
-      // Set class field to combined value for submission
       const combinedClass = value ? `${formData.educationCategory} - ${value}` : "";
-      setFormData({ ...formData, educationYear: value, class: combinedClass });
+      setFormData(prev => ({ ...prev, educationYear: value, class: combinedClass }));
       return;
     }
 
-    setFormData({ ...formData, [name]: value });
+    // Update formData
+    setFormData(prev => ({ ...prev, [name]: value }));
+
+    // Live-validate this field and update errors
+    const fieldError = validateField(name, value);
+    setErrors(prev => ({ ...prev, [name]: fieldError }));
   };
 
   const handleFileChange = (e, field) => {
@@ -178,10 +258,11 @@ export default function StudentForm() {
     return publicData?.publicUrl ?? null;
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  // Full form validation (runs on submit)
+  const runFullValidation = () => {
+    const newErrors = {};
 
-    // Basic validation - keep same mandatory checks you wanted
+    // Required basics (original list)
     const mandatoryFields = [
       { key: 'age', label: 'Age' },
       { key: 'address', label: 'Address' },
@@ -204,14 +285,58 @@ export default function StudentForm() {
     });
 
     if (missing.length > 0) {
-      alert('⚠️ Please fill in all mandatory fields: ' + missing.map(m => m.label).join(', '));
-      return;
+      newErrors._missing = 'Please fill in all mandatory fields: ' + missing.map(m => m.label).join(', ');
     }
 
-    // Age check
+    // Age check (existing)
     const ageVal = formData.age !== "" && formData.age !== null ? Number(formData.age) : null;
     if (ageVal === null || Number.isNaN(ageVal) || ageVal < 6) {
-      alert("⚠️ Age must be at least 6 years.");
+      newErrors.age = "Age must be at least 6 years";
+    }
+
+    // Phone validations
+    const contactErr = validateField("contact", formData.contact);
+    if (contactErr) newErrors.contact = contactErr;
+
+    const whatsappErr = validateField("whatsapp", formData.whatsapp);
+    if (whatsappErr) newErrors.whatsapp = whatsappErr;
+
+    const studentErr = validateField("student_contact", formData.student_contact);
+    if (studentErr) newErrors.student_contact = studentErr;
+
+    // Account number
+    const accErr = validateField("account_no", formData.account_no);
+    if (accErr) newErrors.account_no = accErr;
+
+    // IFSC
+    const ifscErr = validateField("ifsc_code", (formData.ifsc_code || "").toUpperCase());
+    if (ifscErr) newErrors.ifsc_code = ifscErr;
+
+    // Email
+    const emailErr = validateField("email", formData.email);
+    if (emailErr) newErrors.email = emailErr;
+
+    return newErrors;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // run current full validation
+    const newErrors = runFullValidation();
+    setErrors(prev => ({ ...prev, ...newErrors }));
+
+    // if any errors present, alert and block submission
+    if (Object.keys(newErrors).length > 0) {
+      // popup alert summarizing
+      const inlineMsg = newErrors._missing ? newErrors._missing : "Please correct the highlighted fields.";
+      alert("Please correct the errors before submitting.\n\n" + inlineMsg);
+      // scroll to first error field if possible
+      const firstField = Object.keys(newErrors).find(k => k !== "_missing");
+      if (firstField) {
+        const el = document.querySelector(`[name="${firstField}"]`);
+        if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
       return;
     }
 
@@ -268,58 +393,56 @@ export default function StudentForm() {
         return;
       }
 
-    // Success
-    alert("🎉 Form submitted successfully!");
+      // Success
+      alert("🎉 Form submitted successfully!");
+      setSuccessMessage("Form submitted successfully!");
 
-    // optionally reset form
-    setFormData({
-      first_name: "",
-      last_name: "",
-      middle_name: "",
-      dob: "",
-      age: "",
-      pob: "",
-      camp_name: "",
-      nationality: "",
-      address: "",
-      class: "",
-      email: "",
-      contact: "",
-      whatsapp: "",
-      student_contact: "",
-      school: "",
-      branch: "",
-      prev_percent: "",
-      present_percent: "",
-      fee: "",
-      job: "",
-      aspiration: "",
-      scholarship: "",
-      certificates: "",
-      years_area: "",
-      parents_full_names: "",
-      family_members: "",
-      earning_members: "",
-      account_no: "",
-      bank_name: "",
-      bank_branch: "",
-      ifsc_code: "",
-      special_remarks: ""
-    });
-    setFiles({
-      school_id: null,
-      aadhaar: null,
-      income_proof: null,
-      marksheet: null,
-      passport_photo: null,
-      fees_receipt: null,
-      volunteer_signature: null,
-      student_signature: null,
-    });
-
-    
-
-
+      // optionally reset form
+      setFormData({
+        first_name: "",
+        last_name: "",
+        middle_name: "",
+        dob: "",
+        age: "",
+        pob: "",
+        camp_name: "",
+        nationality: "",
+        address: "",
+        class: "",
+        email: "",
+        contact: "",
+        whatsapp: "",
+        student_contact: "",
+        school: "",
+        branch: "",
+        prev_percent: "",
+        present_percent: "",
+        fee: "",
+        job: "",
+        aspiration: "",
+        scholarship: "",
+        certificates: "",
+        years_area: "",
+        parents_full_names: "",
+        family_members: "",
+        earning_members: "",
+        account_no: "",
+        bank_name: "",
+        bank_branch: "",
+        ifsc_code: "",
+        special_remarks: ""
+      });
+      setFiles({
+        school_id: null,
+        aadhaar: null,
+        income_proof: null,
+        marksheet: null,
+        passport_photo: null,
+        fees_receipt: null,
+        volunteer_signature: null,
+        student_signature: null,
+      });
+      setErrors({});
     } catch (err) {
       console.error("Unexpected error on submit:", err);
       alert("❌ Unexpected error occurred. Check console.");
@@ -376,19 +499,20 @@ export default function StudentForm() {
           <div className="form-group">
             <label>
               Date of Birth
-              <input 
-                type="date" 
-                name="dob" 
-                value={formData.dob} 
-                onChange={handleInputChange} 
+              <input
+                type="date"
+                name="dob"
+                value={formData.dob}
+                onChange={handleInputChange}
                 min="1980-01-01"
                 max="2024-12-31"
-                required 
+                required
               />
             </label>
             <label>
               <span className="field-label">Age<span className="required">*</span></span>
               <input type="number" name="age" value={formData.age} min={6} readOnly className="readonly-age" onChange={handleInputChange} />
+              {errors.age && <p className="error-text">{errors.age}</p>}
             </label>
             <label>
               Date of Camp
@@ -407,19 +531,53 @@ export default function StudentForm() {
           <div className="form-group">
             <label>
               <span className="field-label">Parent Number<span className="required">*</span></span>
-              <input type="text" name="contact" value={formData.contact} onChange={handleInputChange} required />
+              <input
+                type="text"
+                name="contact"
+                value={formData.contact}
+                onChange={handleInputChange}
+                maxLength={10}
+                className={errors.contact ? "input-error" : ""}
+                required
+              />
+              {errors.contact && <p className="error-text">{errors.contact}</p>}
             </label>
             <label>
               <span className="field-label">Whatsapp Number For Communication<span className="required">*</span></span>
-              <input type="text" name="whatsapp" value={formData.whatsapp} onChange={handleInputChange} required />
+              <input
+                type="text"
+                name="whatsapp"
+                value={formData.whatsapp}
+                onChange={handleInputChange}
+                maxLength={10}
+                className={errors.whatsapp ? "input-error" : ""}
+                required
+              />
+              {errors.whatsapp && <p className="error-text">{errors.whatsapp}</p>}
             </label>
             <label>
               Student Number
-              <input type="text" name="student_contact" value={formData.student_contact || ""} onChange={handleInputChange} />
+              <input
+                type="text"
+                name="student_contact"
+                value={formData.student_contact || ""}
+                onChange={handleInputChange}
+                maxLength={10}
+                className={errors.student_contact ? "input-error" : ""}
+              />
+              {errors.student_contact && <p className="error-text">{errors.student_contact}</p>}
             </label>
             <label>
               <span className="field-label"> Enter Email For Further Communication<span className="required">*</span></span>
-              <input type="email" name="email" value={formData.email} onChange={handleInputChange} required />
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleInputChange}
+                className={errors.email ? "input-error" : ""}
+                required
+              />
+              {errors.email && <p className="error-text">{errors.email}</p>}
             </label>
 
             <label className="full-width">
@@ -451,9 +609,9 @@ export default function StudentForm() {
           <div className="form-group">
             <label>
               <span className="field-label">Education Level<span className="required">*</span></span>
-              <select 
-                name="educationCategory" 
-                value={formData.educationCategory || ""} 
+              <select
+                name="educationCategory"
+                value={formData.educationCategory || ""}
                 onChange={handleInputChange}
                 required
               >
@@ -469,9 +627,9 @@ export default function StudentForm() {
             {formData.educationCategory && (
               <label style={{ marginTop: "12px" }}>
                 <span className="field-label">Current Year/Level<span className="required">*</span></span>
-                <select 
-                  name="educationYear" 
-                  value={formData.educationYear || ""} 
+                <select
+                  name="educationYear"
+                  value={formData.educationYear || ""}
                   onChange={handleInputChange}
                   required
                 >
@@ -499,130 +657,127 @@ export default function StudentForm() {
         </div>
 
         {/* Other Details */}
-<h2>3. Other Details</h2>
+        <h2>3. Other Details</h2>
 
-{/* --- Does she work to support her family? --- */}
-<div className="form-group">
-  <label>Does she work to support her family?</label>
+        {/* --- Does she work to support her family? --- */}
+        <div className="form-group">
+          <label>Does she work to support her family?</label>
 
-  <div className="radio-inline">
-    <label>
-      <input
-        type="radio"
-        name="does_work"
-        value="YES"
-        checked={formData.does_work === "YES"}
-        onChange={handleInputChange}
-      />
-      Yes
-    </label>
+          <div className="radio-inline">
+            <label>
+              <input
+                type="radio"
+                name="does_work"
+                value="YES"
+                checked={formData.does_work === "YES"}
+                onChange={handleInputChange}
+              />
+              Yes
+            </label>
 
-    <label>
-      <input
-        type="radio"
-        name="does_work"
-        value="NO"
-        checked={formData.does_work === "NO"}
-        onChange={handleInputChange}
-      />
-      No
-    </label>
-  </div>
+            <label>
+              <input
+                type="radio"
+                name="does_work"
+                value="NO"
+                checked={formData.does_work === "NO"}
+                onChange={handleInputChange}
+              />
+              No
+            </label>
+          </div>
 
-  {formData.does_work === "YES" && (
-    <label className="full-width">
-      What kind of job does she do?
-      <input
-        type="text"
-        name="job"
-        value={formData.job}
-        onChange={handleInputChange}
-        placeholder="Describe her occupation"
-      />
-    </label>
-  )}
-</div>
+          {formData.does_work === "YES" && (
+            <label className="full-width">
+              What kind of job does she do?
+              <input
+                type="text"
+                name="job"
+                value={formData.job}
+                onChange={handleInputChange}
+                placeholder="Describe her occupation"
+              />
+            </label>
+          )}
+        </div>
 
-{/* --- Career Aspiration --- */}
-<div className="form-group">
-  <label className="full-width">
-    What are her career aspirations and planned courses for the next two years?
-    <input
-      type="text"
-      name="aspiration"
-      value={formData.aspiration}
-      onChange={handleInputChange}
-    />
-  </label>
-</div>
+        {/* --- Career Aspiration --- */}
+        <div className="form-group">
+          <label className="full-width">
+            What are her career aspirations and planned courses for the next two years?
+            <input
+              type="text"
+              name="aspiration"
+              value={formData.aspiration}
+              onChange={handleInputChange}
+            />
+          </label>
+        </div>
 
-{/* --- Scholarship Question --- */}
-<div className="form-group">
-  <label>Is she getting any scholarship / Govt help / financial assistance?</label>
+        {/* --- Scholarship Question --- */}
+        <div className="form-group">
+          <label>Is she getting any scholarship / Govt help / financial assistance?</label>
 
-  <div className="radio-inline">
-    <label>
-      <input
-        type="radio"
-        name="has_scholarship"
-        value="YES"
-        checked={formData.has_scholarship === "YES"}
-        onChange={handleInputChange}
-      />
-      Yes
-    </label>
+          <div className="radio-inline">
+            <label>
+              <input
+                type="radio"
+                name="has_scholarship"
+                value="YES"
+                checked={formData.has_scholarship === "YES"}
+                onChange={handleInputChange}
+              />
+              Yes
+            </label>
 
-    <label>
-      <input
-        type="radio"
-        name="has_scholarship"
-        value="NO"
-        checked={formData.has_scholarship === "NO"}
-        onChange={handleInputChange}
-      />
-      No
-    </label>
-  </div>
+            <label>
+              <input
+                type="radio"
+                name="has_scholarship"
+                value="NO"
+                checked={formData.has_scholarship === "NO"}
+                onChange={handleInputChange}
+              />
+              No
+            </label>
+          </div>
 
-  {formData.has_scholarship === "YES" && (
-    <label className="full-width">
-      Scholarship / Assistance Details
-      <input
-        type="text"
-        name="scholarship"
-        value={formData.scholarship}
-        onChange={handleInputChange}
-        placeholder="Enter Scholarship Details"
-      />
-    </label>
-  )}
-</div>
+          {formData.has_scholarship === "YES" && (
+            <label className="full-width">
+              Scholarship / Assistance Details
+              <input
+                type="text"
+                name="scholarship"
+                value={formData.scholarship}
+                onChange={handleInputChange}
+                placeholder="Enter Scholarship Details"
+              />
+            </label>
+          )}
+        </div>
 
-{/* --- Other Questions --- */}
-<div className="form-group">
-  <label className="full-width">
-    Achievement Certificates
-    <input
-      type="text"
-      name="certificates"
-      value={formData.certificates}
-      onChange={handleInputChange}
-    />
-  </label>
+        {/* --- Other Questions --- */}
+        <div className="form-group">
+          <label className="full-width">
+            Achievement Certificates
+            <input
+              type="text"
+              name="certificates"
+              value={formData.certificates}
+              onChange={handleInputChange}
+            />
+          </label>
 
-  <label className="full-width">
-    From how long are they living in this area? (Is she a migrant worker?)
-    <input
-      type="text"
-      name="years_area"
-      value={formData.years_area}
-      onChange={handleInputChange}
-    />
-  </label>
-</div>
-
-
-
+          <label className="full-width">
+            From how long are they living in this area? (Is she a migrant worker?)
+            <input
+              type="text"
+              name="years_area"
+              value={formData.years_area}
+              onChange={handleInputChange}
+            />
+          </label>
+        </div>
 
         {/* Document Upload */}
         <div className="section">
@@ -635,11 +790,20 @@ export default function StudentForm() {
           {renderUploadField("Passport Size Photo", "passport_photo")}
 
           <div className="upload-field">
-            <span className="label">Bank Account Details</span>
+            <span className="bank-details-title">Bank Account Details</span>
             <div className="form-group">
               <label>
+
                 <span className="field-label">Account No.<span className="required">*</span></span>
-                <input type="text" name="account_no" value={formData.account_no || ""} onChange={handleInputChange} required />
+                <input
+                  type="text"
+                  name="account_no"
+                  value={formData.account_no || ""}
+                  onChange={handleInputChange}
+                  className={errors.account_no ? "input-error" : ""}
+                  required
+                />
+                {errors.account_no && <p className="error-text">{errors.account_no}</p>}
               </label>
               <label>
                 <span className="field-label">Bank Name<span className="required">*</span></span>
@@ -651,7 +815,15 @@ export default function StudentForm() {
               </label>
               <label>
                 <span className="field-label">IFSC Code<span className="required">*</span></span>
-                <input type="text" name="ifsc_code" value={formData.ifsc_code || ""} onChange={handleInputChange} required />
+                <input
+                  type="text"
+                  name="ifsc_code"
+                  value={formData.ifsc_code || ""}
+                  onChange={handleInputChange}
+                  className={errors.ifsc_code ? "input-error" : ""}
+                  required
+                />
+                {errors.ifsc_code && <p className="error-text">{errors.ifsc_code}</p>}
               </label>
             </div>
           </div>
