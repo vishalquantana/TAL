@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import "./StudentForm.css";
 import VolunteerProfile from "./VolunteerProfile";
 import supabase from "./supabaseClient";
+import EducationDropdown from "./EducationDropdown";
 
 /*
   NOTE: This file preserves your UI exactly and only adds Supabase integration:
@@ -49,6 +50,7 @@ export default function StudentForm() {
     address: "",
     class: "",
     educationCategory: "",
+    educationSubcategory: "",
     educationYear: "",
     email: "",
     contact: "",
@@ -85,28 +87,7 @@ export default function StudentForm() {
     student_signature: null,
   });
 
-  // Education dropdown data
-  const educationOptions = {
-    School: ["8th", "9th", "10th", "Other"],
-    Intermediate: ["11th", "12th", "Other"],
-    Engineering: ["1st Year", "2nd Year", "3rd Year", "4th Year", "Other"],
-    "Medical Field": ["1st Year", "2nd Year", "3rd Year", "Internship", "Other"],
-    Degree: ["1st Year", "2nd Year", "3rd Year", "Other"],
-    "Diploma / Polytechnic": ["1st Year", "2nd Year", "3rd Year", "Other"],
-    "Post-Graduation (PG)": ["1st Year", "2nd Year", "Other"],
-    Other: ["Other"]
-  };
 
-  const educationCategories = [
-    "School",
-    "Intermediate",
-    "Engineering",
-    "Medical Field",
-    "Degree",
-    "Diploma / Polytechnic",
-    "Post-Graduation (PG)",
-    "Other"
-  ];
 
   // Helper: validate a single field and return error message (or empty string)
   const validateField = (name, value) => {
@@ -204,14 +185,20 @@ export default function StudentForm() {
       return;
     }
 
-    // Education category/year handling preserved
+    // Education category/subcategory/year handling
     if (name === "educationCategory") {
-      setFormData(prev => ({ ...prev, educationCategory: value, educationYear: "" }));
+      setFormData(prev => ({ ...prev, educationCategory: value, educationSubcategory: "", educationYear: "" }));
+      return;
+    }
+
+    if (name === "educationSubcategory") {
+      setFormData(prev => ({ ...prev, educationSubcategory: value, educationYear: "" }));
       return;
     }
 
     if (name === "educationYear") {
-      const combinedClass = value ? `${formData.educationCategory} - ${value}` : "";
+      const subcategoryPart = formData.educationSubcategory ? ` - ${formData.educationSubcategory}` : "";
+      const combinedClass = value ? `${formData.educationCategory}${subcategoryPart} - ${value}` : "";
       setFormData(prev => ({ ...prev, educationYear: value, class: combinedClass }));
       return;
     }
@@ -409,6 +396,9 @@ export default function StudentForm() {
         nationality: "",
         address: "",
         class: "",
+        educationCategory: "",
+        educationSubcategory: "",
+        educationYear: "",
         email: "",
         contact: "",
         whatsapp: "",
@@ -605,44 +595,12 @@ export default function StudentForm() {
             </label>
           </div>
 
-          {/* Multi-level Education Dropdown */}
-          <div className="form-group">
-            <label>
-              <span className="field-label">Education Level<span className="required">*</span></span>
-              <select
-                name="educationCategory"
-                value={formData.educationCategory || ""}
-                onChange={handleInputChange}
-                required
-              >
-                <option value="">Select Education Level</option>
-                {educationCategories.map((category) => (
-                  <option key={category} value={category}>
-                    {category}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            {formData.educationCategory && (
-              <label style={{ marginTop: "12px" }}>
-                <span className="field-label">Current Year/Level<span className="required">*</span></span>
-                <select
-                  name="educationYear"
-                  value={formData.educationYear || ""}
-                  onChange={handleInputChange}
-                  required
-                >
-                  <option value="">Select Year/Level</option>
-                  {educationOptions[formData.educationCategory]?.map((year) => (
-                    <option key={year} value={year}>
-                      {year}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            )}
-          </div>
+          <EducationDropdown
+            educationCategory={formData.educationCategory}
+            educationSubcategory={formData.educationSubcategory}
+            educationYear={formData.educationYear}
+            onChange={handleInputChange}
+          />
 
           <div className="form-group">
             <label>
@@ -846,3 +804,4 @@ export default function StudentForm() {
     </div>
   );
 }
+ 
