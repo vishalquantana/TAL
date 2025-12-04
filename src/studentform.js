@@ -460,7 +460,7 @@ export default function StudentForm() {
 
   return (
     <div>
-      <button  class ="back-btn" onClick={() => navigate('/volunteer-dashboard')}>Back to Volunteer Dashboard</button>
+      <button className="back-btn" onClick={() => navigate('/volunteer-dashboard')}>Back to Volunteer Dashboard</button>
        
       <div className="form-container" style={{ marginTop: '60px' }}>
         <h1 className="form-title">STUDENT APPLICATION FORM</h1>
