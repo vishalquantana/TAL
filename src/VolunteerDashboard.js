@@ -179,19 +179,19 @@ export default function VolunteerDashboard() {
             <p style={{margin: 0, color: "#666", fontSize: "0.95rem"}}>Welcome, <strong>{volunteerName}</strong></p>
           </div>
           <button className="fill-form-btn" onClick={handleFillFormClick} style={{
-            padding: "10px 24px",
+            padding: "7px 2px",
             backgroundColor: "#3b82f6",
             border: "none",
-            borderRadius: "50px",
+            borderRadius: "4px",
             color: "white",
             fontWeight: "600",
             cursor: "pointer",
-            fontSize: "0.95rem",
+            fontSize: "0.8rem",
             transition: "all 0.3s ease",
             whiteSpace: "nowrap",
             display: "flex",
             alignItems: "center",
-            gap: "6px",
+            gap: "4px",
             boxShadow: "0 2px 8px rgba(59, 130, 246, 0.2)"
           }} onMouseOver={(e) => {
             e.currentTarget.style.backgroundColor = "#2563eb";
@@ -202,7 +202,7 @@ export default function VolunteerDashboard() {
             e.currentTarget.style.transform = "scale(1)";
             e.currentTarget.style.boxShadow = "0 2px 8px rgba(59, 130, 246, 0.2)";
           }}>
-            <span style={{fontSize: "1.2rem"}}>+</span>
+            <span style={{fontSize: "1rem"}}>+</span>
             New Form
           </button>
         </div>

@@ -1,7 +1,7 @@
 // src/StudentForm.js
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import "./StudentForm.css";
-import VolunteerProfile from "./VolunteerProfile";
 import supabase from "./supabaseClient";
 import EducationDropdown from "./EducationDropdown";
 
@@ -13,6 +13,7 @@ import EducationDropdown from "./EducationDropdown";
 */
 
 export default function StudentForm() {
+  const navigate = useNavigate();
   const [volunteerEmail, setVolunteerEmail] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [errors, setErrors] = useState({}); // <-- validation errors
@@ -383,6 +384,7 @@ export default function StudentForm() {
       // Success
       alert("🎉 Form submitted successfully!");
       setSuccessMessage("Form submitted successfully!");
+      navigate('/volunteer-dashboard');
 
       // optionally reset form
       setFormData({
@@ -457,9 +459,11 @@ export default function StudentForm() {
   );
 
   return (
-    <div className="form-container">
-      <VolunteerProfile />
-      <h1 className="form-title">STUDENT APPLICATION FORM</h1>
+    <div>
+      <button  class ="back-btn" onClick={() => navigate('/volunteer-dashboard')}>Back to Volunteer Dashboard</button>
+       
+      <div className="form-container" style={{ marginTop: '60px' }}>
+        <h1 className="form-title">STUDENT APPLICATION FORM</h1>
 
       {successMessage && (
         <div className="success-message" style={{ color: "green", marginBottom: "1rem", fontWeight: "bold" }}>
@@ -801,6 +805,7 @@ export default function StudentForm() {
           <button type="submit">Submit Application</button>
         </div>
       </form>
+      </div>
     </div>
   );
 }
