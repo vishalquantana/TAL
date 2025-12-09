@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./VolunteerDashboard.css";
 import supabase from "./supabaseClient";
 
 export default function VolunteerDashboard() {
+  const navigate = useNavigate();
   const [forms, setForms] = useState([]);
   const [selectedFormId, setSelectedFormId] = useState(null);
   const [volunteerName, setVolunteerName] = useState("Volunteer");
@@ -65,6 +67,15 @@ export default function VolunteerDashboard() {
     window.location.href = "/studentform";
   };
 
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      navigate("/");
+    } catch (error) {
+      console.error("Error logging out:", error);
+    }
+  };
+
   const selectedForm = forms.find(f => f.id === selectedFormId);
   
   // Calculate statistics
@@ -103,7 +114,7 @@ export default function VolunteerDashboard() {
           </div>
         </div>
         
-        <button className="sidebar-logout-btn">Logout</button>
+        <button className="sidebar-logout-btn" onClick={handleLogout}>Logout</button>
       </aside>
 
       {/* Main Content */}
