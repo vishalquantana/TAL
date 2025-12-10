@@ -58,6 +58,7 @@ export default function StudentForm() {
           educationcategory: parsedData.educationcategory || "",
           educationsubcategory: parsedData.educationsubcategory || "",
           educationyear: parsedData.educationyear || "",
+          fee_structure: parsedData.fee_structure || "",
           email: parsedData.email || "",
           contact: parsedData.contact || "",
           whatsapp: parsedData.whatsapp || "",
@@ -114,6 +115,7 @@ export default function StudentForm() {
     prev_percent: "",
     present_percent: "",
     fee: "",
+    fee_structure: "",
     job: "",
     aspiration: "",
     scholarship: "",
@@ -311,6 +313,7 @@ export default function StudentForm() {
       { key: 'class', label: 'Class' },
       { key: 'prev_percent', label: 'Previous Year Percentage' },
       { key: 'present_percent', label: 'Present Year Percentage' },
+      { key: 'fee_structure', label: 'Fee Structure' },
       { key: 'parents_full_names', label: 'Parents Full Names' },
       { key: 'earning_members', label: 'Earning Members' },
       { key: 'first_name', label: 'First Name' },
@@ -465,6 +468,7 @@ export default function StudentForm() {
         prev_percent: "",
         present_percent: "",
         fee: "",
+        fee_structure: "",
         job: "",
         aspiration: "",
         scholarship: "",
@@ -669,6 +673,14 @@ export default function StudentForm() {
             <label>
               <span className="field-label">Percentage scored in present academic year<span className="required">*</span></span>
               <input type="text" name="present_percent" value={formData.present_percent} onChange={handleInputChange} required />
+            </label>
+          </div>
+
+          <div className="form-group">
+            <label className="full-width">
+              <span className="field-label">Fee Structure<span className="required">*</span></span>
+              <input type="text" name="fee_structure" value={formData.fee_structure || ""} onChange={handleInputChange} className={errors.fee_structure ? 'input-error' : ''} required />
+              {errors.fee_structure && <p className="error-text">{errors.fee_structure}</p>}
             </label>
           </div>
         </div>

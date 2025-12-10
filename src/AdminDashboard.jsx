@@ -1,65 +1,65 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import "./AdminDashboard.css";
+import supabase from "./supabaseClient";
 
 export default function AdminDashboard() {
-  // Dummy data (now includes campName, campDate, course, paidDate)
-  const [students, setStudents] = useState([
-    {
-      id: 1,
-      name: "Asha Devi",
-      college: "Govt College",
-      year: "1st",
-      donor: "Rajesh",
-      feeStatus: "Paid",
-      campName: "Health Camp A",
-      campDate: "2025-03-12",
-      course: "Science",
-      paidDate: "2025-03-15"
-    },
-    {
-      id: 2,
-      name: "Rahul Kumar",
-      college: "City PU College",
-      year: "2nd",
-      donor: "None",
-      feeStatus: "Pending",
-      campName: "Education Drive B",
-      campDate: "2025-04-20",
-      course: "Commerce",
-      paidDate: ""
-    },
-    {
-      id: 3,
-      name: "Meera Singh",
-      college: "State College",
-      year: "3rd",
-      donor: "ABC Trust",
-      feeStatus: "Partial",
-      campName: "Awareness Camp C",
-      campDate: "2024-12-05",
-      course: "Arts",
-      paidDate: "2025-02-10"
-    },
-    {
-      id: 4,
-      name: "Vikram Patel",
-      college: "Tech Institute",
-      year: "4th",
-      donor: "XYZ Corp",
-      feeStatus: "Paid",
-      campName: "Tech Outreach D",
-      campDate: "2025-01-18",
-      course: "Engineering",
-      paidDate: "2025-01-20"
-    },
-  ]);
-
-  const [donors, setDonors] = useState([
-    { id: 1, name: "Rajesh", amount: 5000, years: "2023-2025" },
-    { id: 2, name: "ABC Trust", amount: 12000, years: "2024-2025" },
-    { id: 3, name: "XYZ Corp", amount: 8000, years: "2022-2025" },
-  ]);
+  const [students, setStudents] = useState([]);
+  const [donors, setDonors] = useState([]);
   const [viewDonor, setViewDonor] = useState(null);
+  const [lastFetch, setLastFetch] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch real data from Supabase
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Fetch student form submissions
+        const { data: studentData, error: studentError } = await supabase
+          .from('student_form_submissions')
+          .select('*')
+          .order('created_at', { ascending: false });
+        // Save raw fetch result for debugging
+        setLastFetch({ data: studentData || null, error: studentError || null, fetchedAt: new Date().toISOString() });
+
+        if (studentError) {
+          console.error('AdminDashboard: Error fetching student data:', studentError);
+        } else {
+          console.log('AdminDashboard: fetched studentData (count):', Array.isArray(studentData) ? studentData.length : 0);
+          // Transform student data to match admin dashboard format
+          const transformedStudents = (studentData || []).map((student, index) => ({
+            id: student.id || index + 1,
+            name: `${student.first_name || ''} ${student.middle_name || ''} ${student.last_name || ''}`.trim(),
+            college: student.school || '',
+            year: student.class || '',
+            donor: student.volunteer_email || 'None', // Use volunteer email as donor for now
+            feeStatus: student.fee ? 'Paid' : 'Pending', // Simple logic based on fee field
+            campName: student.camp_name || '',
+            campDate: student.created_at ? new Date(student.created_at).toISOString().split('T')[0] : '',
+            course: student.educationcategory || '',
+            paidDate: student.fee ? new Date(student.created_at).toISOString().split('T')[0] : ''
+          }));
+          setStudents(transformedStudents);
+        }
+
+        // For now, create dummy donors from volunteer emails (you can replace this with real donor data later)
+        const uniqueVolunteers = [...new Set((studentData || []).map(s => s.volunteer_email).filter(Boolean))];
+        const transformedDonors = uniqueVolunteers.map((email, index) => ({
+          id: index + 1,
+          name: email,
+          amount: Math.floor(Math.random() * 10000) + 5000, // Random amount for demo
+          years: "2024-2025"
+        }));
+        setDonors(transformedDonors);
+
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   // filters now include stream (course)
   const [filters, setFilters] = useState({ class: "", donor: "", feeStatus: "", stream: "" });
@@ -249,7 +249,13 @@ export default function AdminDashboard() {
         </header>
 
         <main className="admin-content">
-          {activeSection === "overview" && (
+          {loading && (
+            <div style={{ textAlign: 'center', padding: '2rem' }}>
+              <div>Loading data...</div>
+            </div>
+          )}
+
+          {!loading && activeSection === "overview" && (
             <>
               {/* Overview cards */}
               <section className="cards-row">
@@ -450,6 +456,19 @@ export default function AdminDashboard() {
                   </tbody>
                 </table>
               </div>
+              {/* Debug panel: show raw fetch when no students present to help diagnose Supabase issues */}
+              {students.length === 0 && lastFetch && (
+                <div className="debug-panel">
+                  <h4>Debug: Supabase Fetch Result</h4>
+                  <div style={{whiteSpace: 'pre-wrap', fontSize: '0.85rem', background: '#111', color: '#e6fffd', padding: 12, borderRadius: 6, marginTop: 12}}>
+                    {JSON.stringify(lastFetch, null, 2)}
+                  </div>
+                  <div style={{marginTop:8, fontSize:'0.9rem'}}>
+                    If this shows an empty array, check the table name and whether rows exist in Supabase.
+                    If an error is present, check RLS permissions and your anon key in `src/supabaseClient.js`.
+                  </div>
+                </div>
+              )}
             </section>
           )}
 
