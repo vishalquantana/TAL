@@ -19,7 +19,7 @@ export default function VolunteerLogin() {
     const checkSession = async () => {
       const { data } = await supabase.auth.getSession();
       if (data.session) {
-        navigate("/studentform"); // 👈 volunteer dashboard route
+        navigate("/volunteer-dashboard"); // 👈 volunteer dashboard route
       } else {
         setLoading(false);
       }
@@ -32,20 +32,24 @@ export default function VolunteerLogin() {
   // ✅ Handle sign in & sign up
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log("handleSubmit called", { email, password, isSignIn });
 
     try {
       if (isSignIn) {
         // VOLUNTEER SIGN-IN
+        console.log("Attempting sign in...");
         const { data, error } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
+        console.log("Sign in response:", { data, error });
         if (error) throw error;
 
         toast.success("Signed in successfully!");
         navigate("/volunteer-dashboard");
       } else {
         // VOLUNTEER SIGN-UP 👇 (important)
+        console.log("Attempting sign up...");
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
@@ -56,11 +60,13 @@ export default function VolunteerLogin() {
             },
           },
         });
+        console.log("Sign up response:", { data, error });
         if (error) throw error;
 
         toast.success("Account created successfully!");
       }
     } catch (err) {
+      console.error("Auth error:", err);
       toast.error(err.message);
     }
   };
@@ -70,18 +76,22 @@ export default function VolunteerLogin() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: window.location.origin + "/student-dashboard", // 👈 volunteer dashboard route
+        redirectTo: window.location.origin + "/volunteer-dashboard", // 👈 volunteer dashboard route
       },
     });
     if (error) toast.error(error.message);
   };
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="auth-container">
       <div className="auth-box">
         <h1>{isSignIn ? "Sign In" : "Volunteer Sign Up"}</h1>
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={(e) => { console.log("Form submitted"); handleSubmit(e); }}>
           {!isSignIn && (
             <input
               type="text"
