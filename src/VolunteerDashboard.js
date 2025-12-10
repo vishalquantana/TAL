@@ -9,6 +9,9 @@ export default function VolunteerDashboard() {
   const [selectedFormId, setSelectedFormId] = useState(null);
   const [volunteerName, setVolunteerName] = useState("Volunteer");
   const [volunteerEmail, setVolunteerEmail] = useState("");
+  const [lastFetch, setLastFetch] = useState(null);
+  const [loading, setLoading] = useState(true);
+  
 
   useEffect(() => {
     // Fetch logged-in volunteer data and forms from Supabase
@@ -26,9 +29,14 @@ export default function VolunteerDashboard() {
 
           // Fetch forms submitted by this volunteer
           await fetchForms(email);
+        } else {
+          // not logged in; stop loading and expose debug
+          setLoading(false);
         }
       } catch (error) {
         console.error("Error fetching volunteer data:", error);
+        setLastFetch({ data: null, error: error?.message || String(error), fetchedAt: new Date().toISOString() });
+        setLoading(false);
       }
     };
 
@@ -37,19 +45,26 @@ export default function VolunteerDashboard() {
 
   const fetchForms = async (volunteerEmail) => {
     try {
+      setLoading(true);
+      // Select only the columns we need for the volunteer UI (avoid dumping sensitive fields)
       const { data, error } = await supabase
         .from("student_form_submissions")
-        .select("*")
+        .select("id, first_name, middle_name, last_name, created_at, age, school, class, volunteer_email, fee_structure, contact, whatsapp")
         .eq("volunteer_email", volunteerEmail)
         .order("created_at", { ascending: true });
 
+      // Save a compact debug payload: count + a small sample (avoid full raw dump)
+      const sample = (data && data.length > 0) ? (({ id, first_name, last_name, created_at }) => ({ id, first_name, last_name, created_at }))(data[0]) : null;
+      setLastFetch({ raw: data || null, error: error || null, fetchedAt: new Date().toISOString(), summary: { count: (data || []).length, sample } });
+
       if (error) {
         console.error("Error fetching forms:", error);
+        setLoading(false);
         return;
       }
 
       // Transform the data to match the expected format
-      const transformedForms = data.map((submission, index) => ({
+      const transformedForms = (data || []).map((submission, index) => ({
         id: submission.id, // Use the actual database ID for operations
         displayId: index + 1, // Sequential display ID starting from 1
         title: `${submission.first_name} ${submission.last_name}`,
@@ -59,8 +74,11 @@ export default function VolunteerDashboard() {
       }));
 
       setForms(transformedForms);
+      setLoading(false);
     } catch (error) {
       console.error("Error fetching forms:", error);
+      setLastFetch({ data: null, error: error?.message || String(error), fetchedAt: new Date().toISOString() });
+      setLoading(false);
     }
   };
 
@@ -115,6 +133,9 @@ export default function VolunteerDashboard() {
     }
   };
 
+  // Add non-persistent demo forms for local testing when DB returns no rows
+  
+
   const selectedForm = forms.find(f => f.id === selectedFormId);
   
   // Calculate statistics
@@ -164,10 +185,20 @@ export default function VolunteerDashboard() {
             <span>+</span>
             New Form
           </button>
+          
         </div>
 
         {/* Table Wrapper */}
         <div className="table-wrapper">
+          {loading && (
+            <div style={{padding: 16, color: '#6b7280'}}>Loading forms...</div>
+          )}
+          {!loading && forms.length === 0 && (
+            <div style={{padding:16, textAlign:'center', color:'#6b7280'}}>
+              <div>No submitted forms found for this volunteer.</div>
+              <div style={{marginTop:8}}>If you expected forms, please ensure you're logged in or check the Supabase table for submissions.</div>
+            </div>
+          )}
           {/* Forms Table */}
           <table className="forms-table">
             <thead>
