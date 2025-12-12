@@ -16,16 +16,26 @@ export default function VolunteerLogin() {
 
   // ✅ Check session on load
   useEffect(() => {
-    const checkSession = async () => {
-      const { data } = await supabase.auth.getSession();
-      if (data.session) {
-        navigate("/volunteer-dashboard"); // 👈 volunteer dashboard route
+  const checkSession = async () => {
+    const { data } = await supabase.auth.getSession();
+    const session = data.session;
+
+    if (session) {
+      const userType = session.user.user_metadata?.user_type;
+
+      if (userType === "volunteer") {
+        navigate("/volunteer-dashboard");
       } else {
-        setLoading(false);
+        // 🚫 Someone else (Admin) is logged in → log them out
+        await supabase.auth.signOut();
       }
-    };
-    checkSession();
-  }, [navigate]);
+    }
+
+    setLoading(false);
+  };
+
+  checkSession();
+}, [navigate]);
 
 
 
