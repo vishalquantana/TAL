@@ -12,7 +12,60 @@ export default function StudentLogin() {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(true);
+  const [errors, setErrors] = useState({});
   const navigate = useNavigate();
+
+  // Validation functions
+  const validateEmail = (email) => {
+    if (!email) return "Email is required";
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) return "Please enter a valid email address";
+    return "";
+  };
+
+  const validatePassword = (password) => {
+    if (!password) return "Password is required";
+    if (password.length < 8) return "Password must be at least 8 characters long";
+    if (password.length > 64) return "Password must be less than 64 characters long";
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])([A-Za-z\d!@#$%^&*]{8,64})$/;
+    if (!passwordRegex.test(password)) {
+      return "Password must contain at least one lowercase letter, one uppercase letter, one number, and one special character";
+    }
+    return "";
+  };
+
+  const validateName = (name) => {
+    if (!name) return "Full name is required";
+    if (name.trim().length < 2) return "Full name must be at least 2 characters long";
+    const nameRegex = /^[a-zA-Z\s]+$/;
+    if (!nameRegex.test(name.trim())) return "Full name can only contain letters and spaces";
+    return "";
+  };
+
+  // Handle input changes with validation
+  const handleEmailChange = (e) => {
+    const value = e.target.value;
+    setEmail(value);
+    if (!isSignIn) {
+      setErrors(prev => ({ ...prev, email: validateEmail(value) }));
+    }
+  };
+
+  const handlePasswordChange = (e) => {
+    const value = e.target.value;
+    setPassword(value);
+    if (!isSignIn) {
+      setErrors(prev => ({ ...prev, password: validatePassword(value) }));
+    }
+  };
+
+  const handleNameChange = (e) => {
+    const value = e.target.value;
+    setName(value);
+    if (!isSignIn) {
+      setErrors(prev => ({ ...prev, name: validateName(value) }));
+    }
+  };
 
   // ✅ Check session on load
   useEffect(() => {
@@ -104,30 +157,38 @@ export default function StudentLogin() {
 
         <form onSubmit={handleSubmit}>
           {!isSignIn && (
-            <input
-              type="text"
-              placeholder="Full Name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-            />
+            <>
+              <input
+                type="text"
+                placeholder="Full Name"
+                value={name}
+                onChange={handleNameChange}
+                className={errors.name ? "input-error" : ""}
+                required
+              />
+              {errors.name && <p className="error-text">{errors.name}</p>}
+            </>
           )}
 
           <input
             type="email"
             placeholder="Email Address"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={handleEmailChange}
+            className={errors.email ? "input-error" : ""}
             required
           />
+          {errors.email && <p className="error-text">{errors.email}</p>}
 
           <input
             type="password"
             placeholder="Password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={handlePasswordChange}
+            className={errors.password ? "input-error" : ""}
             required
           />
+          {errors.password && <p className="error-text">{errors.password}</p>}
 
           <button type="submit">{isSignIn ? "Sign In" : "Sign Up"}</button>
         </form>
