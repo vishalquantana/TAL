@@ -26,19 +26,57 @@ export default function AdminDashboard() {
         } else {
           console.log('AdminDashboard: fetched studentData (count):', Array.isArray(studentData) ? studentData.length : 0);
           // Transform student data to match admin dashboard format
-          const transformedStudents = (studentData || []).map((student, index) => ({
-            id: student.id || index + 1,
-            name: `${student.first_name || ''} ${student.middle_name || ''} ${student.last_name || ''}`.trim(),
-            college: student.school || '',
-            year: student.class || '',
-            donor: student.volunteer_email || 'None', // Use volunteer email as donor for now
-            feeStatus: student.fee ? 'Paid' : 'Pending', // Simple logic based on fee field
-            campName: student.camp_name || '',
-            campDate: student.created_at ? new Date(student.created_at).toISOString().split('T')[0] : '',
-            course: student.educationcategory || '',
-            paidDate: student.fee ? new Date(student.created_at).toISOString().split('T')[0] : ''
-          }));
-          setStudents(transformedStudents);
+  const transformedStudents = (studentData || []).map((student, index) => ({
+    id: student.id || index + 1,
+
+    /* TABLE COLUMNS */
+    name: student.full_name,           // Name column
+    // college: student.school,           // College column
+    year: student.class,               // Year column
+    donor: student.volunteer_email || "None",
+    fee_status: student.fee_structure || "Not Provided",
+    course: student.educationcategory || "",
+    camp: student.camp_name,
+    campDate: student.created_at
+      ? new Date(student.created_at).toISOString().split("T")[0]
+      : "",
+
+    /* VIEW MODAL FIELDS */
+    full_name: student.full_name,
+    age: student.age,
+    // address: student.address,
+    // school: student.school,
+    class: student.class,
+    // branch: student.branch,
+    // certificates: student.certificates,
+    prev_percent: student.prev_percent,
+    present_percent: student.present_percent,
+
+    /* Contacts */
+    email: student.email,
+    contact: student.contact,
+    whatsapp: student.whatsapp,
+    student_contact: student.student_contact,
+
+    /* Scholarship */
+    scholarship: student.scholarship,
+    has_scholarship: student.has_scholarship,
+    does_work: student.does_work,
+    earning_members: student.earning_members,
+
+    /* Fees */
+    // fee: student.fee,
+    // fee_structure: student.fee_structure,
+    // paidDate: student.fee_structure
+    //   ? new Date(student.created_at).toISOString().split("T")[0]
+    //   : "",
+
+    /* Other */
+    created_at: student.created_at
+}));
+
+
+     setStudents(transformedStudents);
         }
 
         // For now, create dummy donors from volunteer emails (you can replace this with real donor data later)
@@ -430,11 +468,11 @@ export default function AdminDashboard() {
                   <thead>
                     <tr>
                       <th>Name</th>
-                      <th>College</th>
-                      <th>Year</th>
+                      <th>Email</th>
+                      <th>Education</th>
                       <th>Donor</th>
-                      <th>Fee Status</th>
-                      <th>Course</th>         {/* NEW column (stream) */}
+                      {/* <th>Fee Status</th> */}
+                      <th>Contact</th>         {/* NEW column (stream) */}
                       <th>Camp</th>           {/* NEW column (campName / campDate) */}
                       <th>Actions</th>
                     </tr>
@@ -443,11 +481,11 @@ export default function AdminDashboard() {
                     {filteredStudents.map(s => (
                       <tr key={s.id}>
                         <td>{s.name}</td>
-                        <td>{s.college}</td>
+                        <td>{s.email}</td>
                         <td>{s.year}</td>
                         <td>{s.donor}</td>
-                        <td>{s.feeStatus}</td>
-                        <td>{s.course}</td>
+                        {/* <td>{s.feeStatus}</td> */}
+                        <td>{s.contact}</td>
                         <td>
                           <div style={{whiteSpace: 'nowrap'}}>
                             <div>{s.campName}</div>
@@ -775,22 +813,75 @@ export default function AdminDashboard() {
       </div>
 
       {/* View / Edit modals */}
-      {viewStudent && (
-        <div className="modal-overlay" onClick={() => setViewStudent(null)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <h3>Student Profile</h3>
-            <p><strong>Name:</strong> {viewStudent.name}</p>
-            <p><strong>College:</strong> {viewStudent.college}</p>
-            <p><strong>Year:</strong> {viewStudent.year}</p>
-            <p><strong>Donor:</strong> {viewStudent.donor}</p>
-            <p><strong>Course:</strong> {viewStudent.course}</p>
-            <p><strong>Camp:</strong> {viewStudent.campName} ({viewStudent.campDate})</p>
-            <p><strong>Fee Status:</strong> {viewStudent.feeStatus}</p>
-            <p><strong>Paid Date:</strong> {viewStudent.paidDate || '-'}</p>
-            <button className="btn" onClick={() => setViewStudent(null)}>Close</button>
-          </div>
-        </div>
-      )}
+{viewStudent && (
+  <div className="modal-overlay">
+    <div className="modal">
+      <h3>Student Details</h3>
+
+      <div className="view-grid">
+
+        {/* NAME */}
+        <p><strong>Full Name:</strong> {viewStudent.full_name}</p>
+
+        {/* BASIC INFO */}
+        <p><strong>Age:</strong> {viewStudent.age}</p>
+        {/* <p><strong>Address:</strong> {viewStudent.address}</p> */}
+        {/* <p><strong>School / College:</strong> {viewStudent.school}</p> */}
+
+        {/* CAMP INFO */}
+        <p><strong>Camp Name:</strong> {viewStudent.camp}</p>
+        <p><strong>Camp Date:</strong> {viewStudent.campDate}</p>
+
+        {/* EDUCATION */}
+        <p><strong>Class / Year:</strong> {viewStudent.class}</p>
+        {/* <p><strong>Branch / Stream:</strong> {viewStudent.branch}</p> */}
+        {/* <p><strong>Course:</strong> {viewStudent.course}</p> */}
+        {/* <p><strong>Certificates:</strong> {viewStudent.certificates}</p> */}
+
+        {/* PERCENTAGES */}
+        <p><strong>Previous %:</strong> {viewStudent.prev_percent}</p>
+        <p><strong>Present %:</strong> {viewStudent.present_percent}</p>
+
+        {/* CONTACT INFO */}
+        <p><strong>Email:</strong> {viewStudent.email}</p>
+        <p><strong>Contact:</strong> {viewStudent.contact}</p>
+        <p><strong>WhatsApp:</strong> {viewStudent.whatsapp}</p>
+        <p><strong>Student Contact:</strong> {viewStudent.student_contact}</p>
+
+        {/* SCHOLARSHIP */}
+        <p><strong>Scholarship Type:</strong> {viewStudent.scholarship}</p>
+        <p><strong>Has Scholarship:</strong> {viewStudent.has_scholarship ? "Yes" : "No"}</p>
+        <p><strong>Does Student Work?:</strong> {viewStudent.does_work ? "Yes" : "No"}</p>
+        <p><strong>Earning Members:</strong> {viewStudent.earning_members}</p>
+
+        {/* FEE DETAILS */}
+        {/* <p><strong>Fee Amount:</strong> {viewStudent.fee}</p>
+        <p><strong>Fee Structure:</strong> {viewStudent.fee_structure}</p>
+        <p><strong>Paid Date:</strong> {viewStudent.paidDate}</p> */}
+
+        {/* DONOR */}
+        <p><strong>Donor / Volunteer:</strong> {viewStudent.donor}</p>
+
+        {/* CREATED AT */}
+        <p><strong>Record Created:</strong> 
+          {viewStudent.created_at ? new Date(viewStudent.created_at).toLocaleString() : "—"}
+        </p>
+
+      </div>
+
+      <button 
+        className="btn primary" 
+        style={{ marginTop: "20px" }} 
+        onClick={() => setViewStudent(null)}
+      >
+        Close
+      </button>
+    </div>
+  </div>
+)}
+
+
+
 
       {viewDonor && (
         <div className="modal-overlay" onClick={() => setViewDonor(null)}>
