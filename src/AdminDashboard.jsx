@@ -111,6 +111,14 @@ export default function AdminDashboard() {
     setStudents((prev) => prev.filter((p) => p.id !== id));
   };
 
+  const handleApprove = (id) => {
+    alert(`Student ${id} approved (demo)`);
+  };
+
+  const handleNotApprove = (id) => {
+    alert(`Student ${id} not approved (demo)`);
+  };
+
   const handleEditSave = (data) => {
     // Data contains id + updated fields
     setStudents((prev) => prev.map((p) => (p.id === data.id ? { ...p, ...data } : p)));
@@ -447,9 +455,20 @@ export default function AdminDashboard() {
                           </div>
                         </td>
                         <td>
-                          <button className="btn small icon-btn" onClick={() => setViewStudent(s)} title="View Profile">👁️</button>
-                          <button className="btn small icon-btn" onClick={() => openEditModal(s)} title="Edit">✏️</button>
-                          <button className="btn small danger icon-btn" onClick={() => handleDelete(s.id)} title="Delete">🗑️</button>
+                          <div style={{display: 'flex', flexDirection: 'column', gap: '4px'}}>
+                            <div className="tooltip">
+                              <button className="btn small icon-btn" onClick={() => setViewStudent(s)} style={{backgroundColor: '#e3f2fd', color: '#1976d2', borderColor: '#1976d2'}}>👁️</button>
+                              <span className="tooltiptext">View</span>
+                            </div>
+                            <div className="tooltip">
+                              <button className="btn small icon-btn" onClick={() => handleApprove(s.id)} style={{backgroundColor: '#e8f5e8', color: '#2e7d32', borderColor: '#2e7d32'}}>✅</button>
+                              <span className="tooltiptext">Approved</span>
+                            </div>
+                            <div className="tooltip">
+                              <button className="btn small icon-btn" onClick={() => handleNotApprove(s.id)} style={{backgroundColor: '#ffebee', color: '#c62828', borderColor: '#c62828'}}>❌</button>
+                              <span className="tooltiptext">Not Approved</span>
+                            </div>
+                          </div>
                         </td>
                       </tr>
                     ))}
