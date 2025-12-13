@@ -32,7 +32,9 @@ function App() {
         <Route path="/register" element={<Register />} />
 
         {/* Student flow */}
-        <Route path="/studentform" element={<StudentForm />} />
+     <Route path="/studentform" element={<StudentForm />} />
+<Route path="/studentform/:id" element={<StudentForm />} />
+
         <Route path="/student-login" element={<StudentLogin />} />
         <Route path="/student-dashboard" element={<StudentDashboard />} />
         

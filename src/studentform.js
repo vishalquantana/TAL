@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import "./StudentForm.css";
 import supabase from "./supabaseClient";
 import EducationDropdown from "./EducationDropdown";
+import { useParams } from "react-router-dom";
 
 /*
   NOTE: This file preserves your UI exactly and only adds Supabase integration:
@@ -12,8 +13,11 @@ import EducationDropdown from "./EducationDropdown";
   - Attaches volunteer's logged-in email as volunteer_email
 */
 
+
 export default function StudentForm() {
   const navigate = useNavigate();
+  const { id } = useParams();   // student id
+const isEditMode = !!id;
   const [volunteerEmail, setVolunteerEmail] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [errors, setErrors] = useState({}); // <-- validation errors
@@ -39,57 +43,57 @@ export default function StudentForm() {
     getUser();
 
     // Check if there's edit data in localStorage
-    const editData = localStorage.getItem("editFormData");
-    if (editData) {
-      try {
-        const parsedData = JSON.parse(editData);
-        // Populate form with edit data
-        setFormData({
-          first_name: parsedData.first_name || "",
-          last_name: parsedData.last_name || "",
-          middle_name: parsedData.middle_name || "",
-          dob: parsedData.dob || "",
-          age: parsedData.age || "",
-          pob: parsedData.pob || "",
-          camp_name: parsedData.camp_name || "",
-          nationality: parsedData.nationality || "",
-          address: parsedData.address || "",
-          class: parsedData.class || "",
-          educationcategory: parsedData.educationcategory || "",
-          educationsubcategory: parsedData.educationsubcategory || "",
-          educationyear: parsedData.educationyear || "",
-          fee_structure: parsedData.fee_structure || "",
-          email: parsedData.email || "",
-          contact: parsedData.contact || "",
-          whatsapp: parsedData.whatsapp || "",
-          student_contact: parsedData.student_contact || "",
-          school: parsedData.school || "",
-          branch: parsedData.branch || "",
-          prev_percent: parsedData.prev_percent || "",
-          present_percent: parsedData.present_percent || "",
-          fee: parsedData.fee || "",
-          job: parsedData.job || "",
-          aspiration: parsedData.aspiration || "",
-          scholarship: parsedData.scholarship || "",
-          certificates: parsedData.certificates || "",
-          years_area: parsedData.years_area || "",
-          parents_full_names: parsedData.parents_full_names || "",
-          family_members: parsedData.family_members || "",
-          earning_members: parsedData.earning_members || "",
-          account_no: parsedData.account_no || "",
-          bank_name: parsedData.bank_name || "",
-          bank_branch: parsedData.bank_branch || "",
-          ifsc_code: parsedData.ifsc_code || "",
-          special_remarks: parsedData.special_remarks || "",
-          does_work: parsedData.does_work || "",
-          has_scholarship: parsedData.has_scholarship || ""
-        });
-        // Clear the edit data after loading
-        localStorage.removeItem("editFormData");
-      } catch (error) {
-        console.error("Error loading edit data:", error);
-      }
-    }
+    // const editData = localStorage.getItem("editFormData");
+    // if (editData) {
+    //   try {
+    //     const parsedData = JSON.parse(editData);
+    //     // Populate form with edit data
+    //     setFormData({
+    //       first_name: parsedData.first_name || "",
+    //       last_name: parsedData.last_name || "",
+    //       middle_name: parsedData.middle_name || "",
+    //       dob: parsedData.dob || "",
+    //       age: parsedData.age || "",
+    //       pob: parsedData.pob || "",
+    //       camp_name: parsedData.camp_name || "",
+    //       nationality: parsedData.nationality || "",
+    //       address: parsedData.address || "",
+    //       class: parsedData.class || "",
+    //       educationcategory: parsedData.educationcategory || "",
+    //       educationsubcategory: parsedData.educationsubcategory || "",
+    //       educationyear: parsedData.educationyear || "",
+    //       fee_structure: parsedData.fee_structure || "",
+    //       email: parsedData.email || "",
+    //       contact: parsedData.contact || "",
+    //       whatsapp: parsedData.whatsapp || "",
+    //       student_contact: parsedData.student_contact || "",
+    //       school: parsedData.school || "",
+    //       branch: parsedData.branch || "",
+    //       prev_percent: parsedData.prev_percent || "",
+    //       present_percent: parsedData.present_percent || "",
+    //       fee: parsedData.fee || "",
+    //       job: parsedData.job || "",
+    //       aspiration: parsedData.aspiration || "",
+    //       scholarship: parsedData.scholarship || "",
+    //       certificates: parsedData.certificates || "",
+    //       years_area: parsedData.years_area || "",
+    //       parents_full_names: parsedData.parents_full_names || "",
+    //       family_members: parsedData.family_members || "",
+    //       earning_members: parsedData.earning_members || "",
+    //       account_no: parsedData.account_no || "",
+    //       bank_name: parsedData.bank_name || "",
+    //       bank_branch: parsedData.bank_branch || "",
+    //       ifsc_code: parsedData.ifsc_code || "",
+    //       special_remarks: parsedData.special_remarks || "",
+    //       does_work: parsedData.does_work || "",
+    //       has_scholarship: parsedData.has_scholarship || ""
+    //     });
+    //     // Clear the edit data after loading
+    //     localStorage.removeItem("editFormData");
+    //   } catch (error) {
+    //     console.error("Error loading edit data:", error);
+    //   }
+    // }
   }, []);
 
   const [formData, setFormData] = useState({
@@ -371,6 +375,30 @@ export default function StudentForm() {
 
     return newErrors;
   };
+useEffect(() => {
+  if (!isEditMode) return;
+
+  const fetchStudent = async () => {
+    const { data, error } = await supabase
+      .from("student_form_submissions")
+      .select("*")
+      .eq("id", parseInt(id))
+      .single();
+
+    if (error) {
+      alert("Error loading student data");
+      return;
+    }
+
+    setFormData(prev => ({
+  ...prev,
+  ...data
+}));
+
+  };
+
+  fetchStudent();
+}, [id]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -463,21 +491,41 @@ export default function StudentForm() {
       };
 
       // Insert into Supabase
-      const { data, error } = await supabase
-        .from("student_form_submissions")
-        .insert([payload]);
+      let result;
 
-      if (error) {
-        console.error("Supabase insert error:", error);
-        alert("❌ Error saving student: " + error.message);
-        return;
-      }
+if (isEditMode && id) {
+  // ✅ UPDATE existing record
+  result = await supabase
+    .from("student_form_submissions")
+    .update(payload)
+    .eq("id", parseInt(id));
+} else {
+  // ✅ INSERT new record
+  result = await supabase
+    .from("student_form_submissions")
+    .insert([payload]);
+}
+
+if (result.error) {
+  console.error("Supabase save error:", result.error);
+  alert("❌ Error saving student: " + result.error.message);
+  return;
+}
+
+
+
+      // if (error) {
+      //   console.error("Supabase insert error:", error);
+      //   alert("❌ Error saving student: " + error.message);
+      //   return;
+      // }
 
       // Success
       alert("🎉 Form submitted successfully!");
       setSuccessMessage("Form submitted successfully!");
       // Navigate back to dashboard and force refresh to show new form
-      window.location.href = '/volunteer-dashboard';
+      navigate('/volunteer-dashboard');
+
 
       // optionally reset form
       setFormData({

@@ -89,7 +89,8 @@ export default function VolunteerDashboard() {
   const handleFillFormClick = () => {
     // Clear any existing edit data
     localStorage.removeItem("editFormData");
-    window.location.href = "/studentform"; // or use navigate in real app
+   navigate("/studentform");
+// or use navigate in real app
   };
 
   const handleDeleteClick = async (id) => {
@@ -98,7 +99,7 @@ export default function VolunteerDashboard() {
         const { error } = await supabase
           .from("student_form_submissions")
           .delete()
-          .eq("id", id);
+          .eq("id", parseInt(id));
 
         if (error) {
           console.error("Error deleting form:", error);
@@ -117,12 +118,11 @@ export default function VolunteerDashboard() {
     }
   };
 
-  const handleEditClick = (form) => {
-    // Save form data for edit in localStorage (or context/state management)
-    localStorage.setItem("editFormData", JSON.stringify(form.dataForEdit));
-    // Navigate to form page for editing
-    window.location.href = "/studentform";
-  };
+const handleEditClick = (form) => {
+  navigate(`/studentform/${form.id}`);
+};
+
+
 
   const handleLogout = async () => {
     try {
