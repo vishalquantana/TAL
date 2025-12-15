@@ -1,4 +1,3 @@
-// src/ResetPassword.js
 import React, { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import supabase from "./supabaseClient";
@@ -9,31 +8,35 @@ export default function ResetPassword() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(true);
+  const [hasSession, setHasSession] = useState(false);
 
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const role = searchParams.get("role");
 
   useEffect(() => {
-  const init = async () => {
-    try {
-      const { data, error } =
-        await supabase.auth.exchangeCodeForSession(window.location.href);
+    const init = async () => {
+      try {
+        if (
+          window.location.href.includes("access_token") ||
+          window.location.href.includes("refresh_token") ||
+          window.location.href.includes("type=recovery")
+        ) {
+          await supabase.auth.exchangeCodeForSession(window.location.href);
+        }
 
-      if (error) {
-        toast.error("Invalid or expired reset link");
+        const { data } = await supabase.auth.getSession();
+        setHasSession(!!data.session);
+      } catch (err) {
+        console.error(err);
+        toast.error("Failed to verify reset link");
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      console.error(err);
-      toast.error("Reset link verification failed");
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
 
-  init();
-}, []);
-
+    init();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -45,20 +48,19 @@ export default function ResetPassword() {
 
     try {
       const { error } = await supabase.auth.updateUser({ password });
-
       if (error) throw error;
 
       toast.success("Password updated successfully!");
 
-      // Logout after reset
       await supabase.auth.signOut();
 
-      // Redirect based on role
-      if (role === "admin") {
-        navigate("/adminlogin");
-      } else {
-        navigate("/volunteerlogin");
-      }
+      setTimeout(() => {
+        if (role === "admin") {
+          navigate("/adminlogin");
+        } else {
+          navigate("/volunteerlogin");
+        }
+      }, 1500);
     } catch (err) {
       toast.error(err.message);
     }
@@ -66,40 +68,45 @@ export default function ResetPassword() {
 
   if (loading) {
     return (
-      <div className="auth-container">
-        <p style={{ color: "white", textAlign: "center" }}>
-          Verifying reset link...
-        </p>
-        <ToastContainer position="top-center" />
+      <div style={{ color: "white", textAlign: "center", marginTop: "100px" }}>
+        Verifying reset link...
+        <ToastContainer />
       </div>
     );
   }
 
   return (
-    <div className="auth-container">
-      <div className="auth-box">
-        <h1>Reset Password</h1>
+    <div style={{ color: "white", textAlign: "center", marginTop: "100px" }}>
+      <h1>Reset Password</h1>
+      <p>Role: {role}</p>
 
-        <form onSubmit={handleSubmit}>
-          <input
-            type="password"
-            placeholder="New Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
+      {!hasSession && (
+        <p style={{ color: "orange" }}>
+          Opened manually. Please use reset link from email.
+        </p>
+      )}
 
-          <input
-            type="password"
-            placeholder="Confirm New Password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            required
-          />
+      <form onSubmit={handleSubmit}>
+        <input
+          type="password"
+          placeholder="New Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
+        <br /><br />
 
-          <button type="submit">Update Password</button>
-        </form>
-      </div>
+        <input
+          type="password"
+          placeholder="Confirm Password"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          required
+        />
+        <br /><br />
+
+        <button type="submit">Update Password</button>
+      </form>
 
       <ToastContainer position="top-center" />
     </div>
