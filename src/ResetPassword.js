@@ -76,13 +76,13 @@ export default function ResetPassword() {
   }
 
   return (
-    <div style={{ color: "white", textAlign: "center", marginTop: "100px" }}>
+    <div style={{ color: "Black", textAlign: "center", marginTop: "100px" }}>
       <h1>Reset Password</h1>
-      <p>Role: {role}</p>
+      
 
       {!hasSession && (
-        <p style={{ color: "orange" }}>
-          Opened manually. Please use reset link from email.
+        <p style={{ color: "Red" }}>
+           Please use reset link from email.
         </p>
       )}
 

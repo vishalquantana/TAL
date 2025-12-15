@@ -83,7 +83,7 @@ export default function AdminLogin() {
   return (
     <div className="auth-container">
       <div className="auth-box">
-        <h1>{isSignIn ? "Sign In" : "Admin Sign Up"}</h1>
+        <h1>{isSignIn ? "Sign In" : "Sign Up"}</h1>
 
         <form onSubmit={handleSubmit}>
           {!isSignIn && (
