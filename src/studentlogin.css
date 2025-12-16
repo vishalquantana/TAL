@@ -33,7 +33,7 @@ body {
 .auth-box form {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 5px;
 }
 
 .auth-box input {
@@ -138,4 +138,14 @@ body {
 
 .forgot-password:hover {
   text-decoration: underline;
+}
+
+.error-text {
+  margin: 0;
+  color: #d32f2f;
+  font-size: 0.9rem;
+}
+
+.input-error {
+  border-color: #d32f2f;
 }
