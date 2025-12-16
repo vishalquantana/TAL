@@ -203,41 +203,83 @@ export default function VolunteerLogin() {
             <p className="error-text">{errors.email}</p>
           )}
 
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => {
-              setPassword(e.target.value);
-              if (touched.password) {
-                setErrors({ ...errors, password: validatePassword(e.target.value) });
-              }
-            }}
-            onBlur={() => {
-              setTouched({ ...touched, password: true });
-              setErrors({ ...errors, password: validatePassword(password) });
-            }}
-            className={errors.password ? "input-error" : ""}
-            required
-          />
-          {errors.password && (
-            <ul className="error-text">
-              {errors.password.map((err, index) => (
-                <li key={index}>{err}</li>
-              ))}
-            </ul>
-          )}
+         
+           <input
+  type="password"
+  placeholder="Password"
+  value={password}
+  onChange={(e) => {
+    setPassword(e.target.value);
 
-          <button
-            type="submit"
-            disabled={
-              isSignIn
-                ? !email || !password || errors.email || errors.password
-                : !name || !email || !password || errors.name || errors.email || errors.password
-            }
-          >
-            {isSignIn ? "Sign In" : "Sign Up"}
-          </button>
+    if (!isSignIn && touched.password) {
+      setErrors({
+        ...errors,
+        password: validatePassword(e.target.value),
+      });
+    }
+
+    if (isSignIn && touched.password) {
+      setErrors({
+        ...errors,
+        password: e.target.value ? "" : "Password is required",
+      });
+    }
+  }}
+  onBlur={() => {
+    setTouched({ ...touched, password: true });
+
+    if (isSignIn) {
+      setErrors({
+        ...errors,
+        password: password ? "" : "Password is required",
+      });
+    } else {
+      setErrors({
+        ...errors,
+        password: validatePassword(password),
+      });
+    }
+  }}
+  className={
+    isSignIn
+      ? errors.password
+        ? "input-error"
+        : ""
+      : Array.isArray(errors.password) && errors.password.length > 0
+      ? "input-error"
+      : ""
+  }
+  required
+/>
+{isSignIn && errors.password && (
+  <p className="error-text">{errors.password}</p>
+)}
+
+{!isSignIn &&
+  Array.isArray(errors.password) &&
+  errors.password.length > 0 && (
+    <ul className="error-text">
+      {errors.password.map((err, index) => (
+        <li key={index}>{err}</li>
+      ))}
+    </ul>
+  )}
+<button
+  type="submit"
+  disabled={
+    isSignIn
+      ? !email || !password || !!errors.email || !!errors.password
+      : !name ||
+        !email ||
+        !password ||
+        !!errors.name ||
+        !!errors.email ||
+        (Array.isArray(errors.password) && errors.password.length > 0)
+  }
+>
+  {isSignIn ? "Sign In" : "Sign Up"}
+</button>
+
         </form>
 
         <p className="switch-text">
