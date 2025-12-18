@@ -21,17 +21,18 @@ export default function VolunteerLogin() {
   const validateEmail = (value) =>
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 
-  const validatePassword = (value) => {
-    const errors = [];
-    if (!/[a-z]/.test(value)) errors.push("Must include a lowercase letter");
-    if (!/[A-Z]/.test(value)) errors.push("Must include an uppercase letter");
-    if (!/[0-9]/.test(value)) errors.push("Must include a number");
-    if (!/[@$!%*?&]/.test(value))
-      errors.push("Must include a special character (@$!%*?&)");
-    if (value.length < 8)
-      errors.push("Must be at least 8 characters long");
-    return errors;
-  };
+ const validatePassword = (value) => {
+  const errors = [];
+  if (!/[a-z]/.test(value)) errors.push("Must include a lowercase letter");
+  if (!/[A-Z]/.test(value)) errors.push("Must include an uppercase letter");
+  if (!/[0-9]/.test(value)) errors.push("Must include a number");
+  if (!/[@$!%*?&]/.test(value))
+    errors.push("Must include a special character (@$!%*?&)");
+  if (value.length < 8)
+    errors.push("Must be at least 8 characters long");
+  return errors;
+};
+
 
   /* ---------------- SESSION CHECK ---------------- */
 
@@ -152,16 +153,18 @@ export default function VolunteerLogin() {
           {/* PASSWORD FIELD WITH PROFESSIONAL EYE ICON */}
           <div style={{ position: "relative" }}>
             <input
-              type={showPassword ? "text" : "password"}
-              placeholder="Password"
-              value={password}
-              onChange={(e) => {
-                setPassword(e.target.value);
-                setPasswordErrors(validatePassword(e.target.value));
-              }}
-              style={{ paddingRight: "42px" }}
-              required
-            />
+  type={showPassword ? "text" : "password"}
+  placeholder="Password"
+  value={password}
+  onChange={(e) => {
+    const value = e.target.value;
+    setPassword(value);
+    setPasswordErrors(validatePassword(value));
+  }}
+  required
+  style={{ paddingRight: "40px" }}
+/>
+
 
             <span
               onClick={() => setShowPassword(!showPassword)}
@@ -189,6 +192,20 @@ export default function VolunteerLogin() {
               ))}
             </ul>
           )}
+{passwordErrors.length > 0 && (
+  <ul
+    style={{
+      color: "red",
+      fontSize: "0.9rem",
+      marginTop: "6px",
+      paddingLeft: "18px",
+    }}
+  >
+    {passwordErrors.map((err, index) => (
+      <li key={index}>{err}</li>
+    ))}
+  </ul>
+)}
 
           <button type="submit">
             {isSignIn ? "Sign In" : "Sign Up"}
