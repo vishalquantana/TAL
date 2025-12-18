@@ -1,8 +1,10 @@
 import React, { useMemo, useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import "./AdminDashboard.css";
 import supabase from "./supabaseClient";
 
 export default function AdminDashboard() {
+  const navigate = useNavigate();
   const [students, setStudents] = useState([]);
   const [donors, setDonors] = useState([]);
   const [viewDonor, setViewDonor] = useState(null);
@@ -333,6 +335,15 @@ const handleNotApprove = async (studentId) => {
     setEditStudent({ ...s });
   };
 
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      navigate("/");
+    } catch (error) {
+      console.error("Error logging out:", error);
+    }
+  };
+
   return (
     <div className="admin-root">
       <aside className="admin-sidebar">
@@ -350,7 +361,7 @@ const handleNotApprove = async (studentId) => {
             </ul>
           </nav>
         </div>
-        <button className="logout-btn" onClick={() => window.location.href = '/'}>Logout</button>
+        <button className="logout-btn" onClick={handleLogout}>Logout</button>
       </aside>
 
       <div className="admin-main">

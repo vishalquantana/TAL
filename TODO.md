@@ -1,21 +1,13 @@
-# Validation Implementation Plan
+# TODO: Fix Admin Logout Functionality
 
-## Files to Update
-- [x] src/register.js: Enhance password validation, add full name validation (only letters)
-- [x] src/volunteerlogin.js: Add validations for sign-in (email/password) and sign-up (name/email/password)
-- [x] src/adminlogin.js: Add validations for sign-in and sign-up
-- [ ] src/donorlogin.js: Replace basic validations with full specs
-- [ ] src/studentlogin.js: Add validations for sign-in and sign-up
-- [ ] src/ResetPassword.js: Add password strength validation for new password
+## Current Issue
+- Admin logout button only redirects to home page without signing out from Supabase auth
+- Session persists, causing automatic redirect to dashboard on next login attempt
+- Other dashboards (Volunteer, Student) have proper logout that calls supabase.auth.signOut()
 
-## Validation Rules
-- Email: Required, regex ^[^\s@]+@[^\s@]+\.[^\s@]+$
-- Password: Required, 8-64 chars, at least one lowercase, uppercase, number, special (!@#$%^&*), no spaces
-- Full Name: Required during sign-up, only letters and spaces, min 2 chars
+## Tasks
+- [x] Update AdminDashboard.jsx logout button to properly sign out user
+- [x] Test logout functionality to ensure session is cleared
 
-## Implementation Details
-- Add validateEmail, validatePassword, validateName functions
-- Use state for errors and touched fields
-- Real-time validation on onChange/onBlur
-- Prevent form submission if errors exist
-- Display error messages below inputs
+## Files to Edit
+- src/AdminDashboard.jsx: Update logout button handler
