@@ -11,93 +11,65 @@ export default function VolunteerLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [passwordErrors, setPasswordErrors] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [errors, setErrors] = useState({});
-  const [touched, setTouched] = useState({ name: false, email: false, password: false });
   const navigate = useNavigate();
 
-  // ✅ Validation functions
-  const validateName = (value) => {
-    if (!value.trim()) {
-      return "❌ Full name is required";
-    }
-    const regex = /^[a-zA-Z\s]+$/;
-    if (!regex.test(value)) {
-      return "❌ Full name must contain only letters and spaces";
-    }
-    if (value.trim().length < 2) {
-      return "❌ Full name must be at least 2 characters long";
-    }
-    return "";
-  };
+  /* ---------------- VALIDATIONS ---------------- */
 
-  const validateEmail = (value) => {
-    const regex = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/;
-    if (!regex.test(value)) {
-      return "❌ Wrong email format (example: name@example.com)";
-    }
-    return "";
-  };
+  const validateEmail = (value) =>
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 
   const validatePassword = (value) => {
     const errors = [];
-    if (!/[a-z]/.test(value)) errors.push("❌ Must include a lowercase letter");
-    if (!/[A-Z]/.test(value)) errors.push("❌ Must include an uppercase letter");
-    if (!/[0-9]/.test(value)) errors.push("❌ Must include a number");
-    if (!/[@$!%*?&]/.test(value)) errors.push("❌ Must include a special character (@$!%*?&)");
-    if (value.length < 8) errors.push("❌ Must be at least 8 characters long");
+    if (!/[a-z]/.test(value)) errors.push("Must include a lowercase letter");
+    if (!/[A-Z]/.test(value)) errors.push("Must include an uppercase letter");
+    if (!/[0-9]/.test(value)) errors.push("Must include a number");
+    if (!/[@$!%*?&]/.test(value))
+      errors.push("Must include a special character (@$!%*?&)");
+    if (value.length < 8)
+      errors.push("Must be at least 8 characters long");
     return errors;
   };
 
-  // 🔹 Inline style for forgot password
-  const forgotPasswordStyle = {
-    marginTop: "10px",
-    textAlign: "center",
-    color: "#6a5acd",
-    cursor: "pointer",
-    fontSize: "0.95rem",
-  };
+  /* ---------------- SESSION CHECK ---------------- */
 
   useEffect(() => {
     const checkSession = async () => {
       const { data } = await supabase.auth.getSession();
-      if (data.session) {
-        const userType = data.session.user.user_metadata?.user_type;
-        if (userType === "volunteer") {
-          navigate("/volunteer-dashboard");
-        } else {
-          await supabase.auth.signOut();
-        }
+      if (data.session?.user?.user_metadata?.user_type === "volunteer") {
+        navigate("/volunteer-dashboard");
       }
       setLoading(false);
     };
     checkSession();
   }, [navigate]);
 
-  useEffect(() => {
-    setErrors({});
-    setTouched({ name: false, email: false, password: false });
-  }, [isSignIn]);
+  /* ---------------- SUBMIT ---------------- */
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const newErrors = {};
-    if (isSignIn) {
-      const emailErr = validateEmail(email);
-      if (emailErr) newErrors.email = emailErr;
-      if (!password) newErrors.password = "Password is required";
-    } else {
-      const nameErr = validateName(name);
-      if (nameErr) newErrors.name = nameErr;
-      const emailErr = validateEmail(email);
-      if (emailErr) newErrors.email = emailErr;
-      const passErrs = validatePassword(password);
-      if (passErrs.length > 0) newErrors.password = passErrs;
+    if (!validateEmail(email)) {
+      toast.error("Invalid email format");
+      return;
     }
 
-    setErrors(newErrors);
-    if (Object.keys(newErrors).length > 0) return;
+    if (!isSignIn) {
+      if (!name.trim()) {
+        toast.error("Full name is required");
+        return;
+      }
+    }
+
+    const pwdErrors = validatePassword(password);
+    setPasswordErrors(pwdErrors);
+
+    if (pwdErrors.length > 0) {
+      toast.error("Please fix password requirements");
+      return;
+    }
 
     try {
       if (isSignIn) {
@@ -109,7 +81,7 @@ export default function VolunteerLogin() {
 
         if (data.user.user_metadata.user_type !== "volunteer") {
           await supabase.auth.signOut();
-          toast.error("Unauthorized login");
+          toast.error("Unauthorized access");
           return;
         }
 
@@ -124,118 +96,101 @@ export default function VolunteerLogin() {
           },
         });
         if (error) throw error;
+
         toast.success("Account created successfully");
+        setIsSignIn(true);
       }
     } catch (err) {
       toast.error(err.message);
     }
   };
 
-  // 🔑 Forgot Password
+  /* ---------------- FORGOT PASSWORD ---------------- */
+
   const handleForgotPassword = async () => {
     if (!email) {
-    toast.error("Please enter your email first");
-    return;
-  }
+      toast.error("Enter email first");
+      return;
+    }
 
-  const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: "http://localhost:3000/reset-password?role=volunteer",
-  });
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: "http://localhost:3000/reset-password",
+    });
 
-  if (error) {
-    toast.error(error.message);
-  } else {
-    toast.success("Password reset email sent 📧");
-  }
+    if (error) toast.error(error.message);
+    else toast.success("Password reset email sent");
   };
 
-  
+  if (loading) return <div>Loading...</div>;
+
+  /* ---------------- UI ---------------- */
 
   return (
     <div className="auth-container">
       <div className="auth-box">
-        <h1>{isSignIn ? "Sign In" : "Sign Up"}</h1>
+        <h1>{isSignIn ? "Volunteer Sign In" : "Volunteer Sign Up"}</h1>
 
         <form onSubmit={handleSubmit}>
           {!isSignIn && (
-            <>
-              <input
-                type="text"
-                placeholder="Full Name"
-                value={name}
-                onChange={(e) => {
-                  setName(e.target.value);
-                  if (touched.name) {
-                    setErrors({ ...errors, name: validateName(e.target.value) });
-                  }
-                }}
-                onBlur={() => {
-                  setTouched({ ...touched, name: true });
-                  setErrors({ ...errors, name: validateName(name) });
-                }}
-                className={errors.name ? "input-error" : ""}
-                required
-              />
-              {errors.name && (
-                <p className="error-text">{errors.name}</p>
-              )}
-            </>
+            <input
+              type="text"
+              placeholder="Full Name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+            />
           )}
 
           <input
             type="email"
             placeholder="Email Address"
             value={email}
-            onChange={(e) => {
-              setEmail(e.target.value);
-              if (touched.email) {
-                setErrors({ ...errors, email: validateEmail(e.target.value) });
-              }
-            }}
-            onBlur={() => {
-              setTouched({ ...touched, email: true });
-              setErrors({ ...errors, email: validateEmail(email) });
-            }}
-            className={errors.email ? "input-error" : ""}
+            onChange={(e) => setEmail(e.target.value)}
             required
           />
-          {errors.email && (
-            <p className="error-text">{errors.email}</p>
-          )}
 
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => {
-              setPassword(e.target.value);
-              if (touched.password) {
-                setErrors({ ...errors, password: validatePassword(e.target.value) });
-              }
-            }}
-            onBlur={() => {
-              setTouched({ ...touched, password: true });
-              setErrors({ ...errors, password: validatePassword(password) });
-            }}
-            className={errors.password ? "input-error" : ""}
-            required
-          />
-          {errors.password && (
+          {/* PASSWORD FIELD WITH PROFESSIONAL EYE ICON */}
+          <div style={{ position: "relative" }}>
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="Password"
+              value={password}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                setPasswordErrors(validatePassword(e.target.value));
+              }}
+              style={{ paddingRight: "42px" }}
+              required
+            />
+
+            <span
+              onClick={() => setShowPassword(!showPassword)}
+              style={{
+                position: "absolute",
+                right: "12px",
+                top: "50%",
+                transform: "translateY(-50%)",
+                cursor: "pointer",
+                color: "#555",
+                fontSize: "18px",
+                userSelect: "none",
+              }}
+              title={showPassword ? "Hide password" : "Show password"}
+            >
+              {showPassword ? "👁‍🗨" : "👁"}
+            </span>
+          </div>
+
+          {/* PASSWORD RULE FEEDBACK */}
+          {!isSignIn && passwordErrors.length > 0 && (
             <ul className="error-text">
-              {errors.password.map((err, index) => (
+              {passwordErrors.map((err, index) => (
                 <li key={index}>{err}</li>
               ))}
             </ul>
           )}
 
-          <button
-            type="submit"
-            disabled={
-              isSignIn
-                ? !email || !password || errors.email || errors.password
-                : !name || !email || !password || errors.name || errors.email || errors.password
-            }
-          >
+          <button type="submit">
             {isSignIn ? "Sign In" : "Sign Up"}
           </button>
         </form>
@@ -247,13 +202,15 @@ export default function VolunteerLogin() {
           </span>
         </p>
 
-        {/* 🔹 Forgot Password */}
         {isSignIn && (
           <p
-            style={forgotPasswordStyle}
             onClick={handleForgotPassword}
-            onMouseOver={(e) => (e.target.style.textDecoration = "underline")}
-            onMouseOut={(e) => (e.target.style.textDecoration = "none")}
+            style={{
+              marginTop: "10px",
+              textAlign: "center",
+              color: "#6a5acd",
+              cursor: "pointer",
+            }}
           >
             Forgot password?
           </p>
