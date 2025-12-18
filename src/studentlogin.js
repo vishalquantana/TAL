@@ -11,40 +11,63 @@ export default function StudentLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+
+  const [emailError, setEmailError] = useState("");
+  const [passwordErrors, setPasswordErrors] = useState([]);
+
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  // 🔹 Inline style for Forgot Password
-  const forgotStyle = {
-    marginTop: "10px",
-    textAlign: "center",
-    color: "#2563eb",
-    cursor: "pointer",
-    fontSize: "0.95rem",
+  /* ---------------- VALIDATIONS ---------------- */
+
+  const validateEmail = (value) => {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+      return "Please enter a valid email address";
+    }
+    return "";
   };
 
-  // 🔍 Check session
+  const validatePassword = (value) => {
+    const errors = [];
+    if (!/[a-z]/.test(value)) errors.push("Must include a lowercase letter");
+    if (!/[A-Z]/.test(value)) errors.push("Must include an uppercase letter");
+    if (!/[0-9]/.test(value)) errors.push("Must include a number");
+    if (!/[@$!%*?&]/.test(value))
+      errors.push("Must include a special character (@$!%*?&)");
+    if (value.length < 8)
+      errors.push("Must be at least 8 characters long");
+    return errors;
+  };
+
+  /* ---------------- SESSION CHECK ---------------- */
+
   useEffect(() => {
     const checkSession = async () => {
       const { data } = await supabase.auth.getSession();
-      if (data.session) {
-        const userType = data.session.user.user_metadata?.user_type;
-        if (userType === "student") {
-          navigate("/student-dashboard");
-        } else {
-          await supabase.auth.signOut();
-          toast.error("Unauthorized access");
-        }
-      } else {
-        setLoading(false);
+      if (data.session?.user?.user_metadata?.user_type === "student") {
+        navigate("/student-dashboard");
       }
+      setLoading(false);
     };
     checkSession();
   }, [navigate]);
 
-  // 🔐 Login / Signup
+  /* ---------------- SUBMIT ---------------- */
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const emailErr = validateEmail(email);
+    setEmailError(emailErr);
+
+    const pwdErrors = validatePassword(password);
+    setPasswordErrors(pwdErrors);
+
+    if (emailErr || pwdErrors.length > 0) {
+      toast.error("Please fix the highlighted errors");
+      return;
+    }
 
     try {
       if (isSignIn) {
@@ -60,9 +83,14 @@ export default function StudentLogin() {
           return;
         }
 
-        toast.success("Login successful");
+        toast.success("Login successful 🎉");
         navigate("/student-dashboard");
       } else {
+        if (!name.trim()) {
+          toast.error("Full name is required");
+          return;
+        }
+
         const { error } = await supabase.auth.signUp({
           email,
           password,
@@ -75,14 +103,16 @@ export default function StudentLogin() {
         });
         if (error) throw error;
 
-        toast.success("Account created successfully");
+        toast.success("Account created successfully 🎉");
+        setIsSignIn(true);
       }
     } catch (err) {
       toast.error(err.message);
     }
   };
 
-  // 🔑 Forgot Password
+  /* ---------------- FORGOT PASSWORD ---------------- */
+
   const handleForgotPassword = async () => {
     if (!email) {
       toast.error("Please enter your email first");
@@ -99,10 +129,12 @@ export default function StudentLogin() {
 
   if (loading) return <div>Loading...</div>;
 
+  /* ---------------- UI ---------------- */
+
   return (
     <div className="auth-container">
       <div className="auth-box">
-        <h1>{isSignIn ? "Sign In" : "Student Sign Up"}</h1>
+        <h1>{isSignIn ? "Student Sign In" : "Student Sign Up"}</h1>
 
         <form onSubmit={handleSubmit}>
           {!isSignIn && (
@@ -115,21 +147,73 @@ export default function StudentLogin() {
             />
           )}
 
+          {/* EMAIL */}
           <input
             type="email"
             placeholder="Email Address"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              setEmailError(validateEmail(e.target.value));
+            }}
             required
           />
+          {emailError && <p className="error-text">{emailError}</p>}
 
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
+          {/* PASSWORD */}
+          <div style={{ position: "relative" }}>
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="Password"
+              value={password}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                setPasswordErrors(validatePassword(e.target.value));
+              }}
+              style={{ paddingRight: "42px" }}
+              required
+            />
+
+            <span
+              onClick={() => setShowPassword(!showPassword)}
+              style={{
+                position: "absolute",
+                right: "12px",
+                top: "50%",
+                transform: "translateY(-50%)",
+                cursor: "pointer",
+                color: "#555",
+                fontSize: "18px",
+                userSelect: "none",
+              }}
+              title={showPassword ? "Hide password" : "Show password"}
+            >
+              {showPassword ? "👁‍🗨" : "👁"}
+            </span>
+          </div>
+
+          {/* PASSWORD ERRORS */}
+          {!isSignIn && passwordErrors.length > 0 && (
+            <ul className="error-text">
+              {passwordErrors.map((err, index) => (
+                <li key={index}>{err}</li>
+              ))}
+            </ul>
+          )}
+{passwordErrors.length > 0 && (
+  <ul
+    style={{
+      color: "red",
+      fontSize: "0.9rem",
+      marginTop: "6px",
+      paddingLeft: "18px",
+    }}
+  >
+    {passwordErrors.map((err, index) => (
+      <li key={index}>{err}</li>
+    ))}
+  </ul>
+)}
 
           <button type="submit">
             {isSignIn ? "Sign In" : "Sign Up"}
@@ -143,12 +227,18 @@ export default function StudentLogin() {
           </span>
         </p>
 
-        {/* 🔐 FORGOT PASSWORD */}
         {isSignIn && (
-          <p style={forgotStyle} onClick={handleForgotPassword}
+          <p
+            onClick={handleForgotPassword}
+            style={{
+              marginTop: "10px",
+              textAlign: "center",
+              color: "#2563eb",
+              cursor: "pointer",
+            }}
             onMouseOver={(e) => (e.target.style.textDecoration = "underline")}
             onMouseOut={(e) => (e.target.style.textDecoration = "none")}
-            >
+          >
             Forgot password?
           </p>
         )}
