@@ -12,17 +12,26 @@ export default function DonorLogin() {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+
   const [emailError, setEmailError] = useState("");
+  const [nameError, setNameError] = useState("");
   const [passwordErrors, setPasswordErrors] = useState([]);
+
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  /* ---------------- VALIDATION FUNCTIONS ---------------- */
+  /* ---------------- VALIDATIONS ---------------- */
+
+  const validateName = (value) => {
+    if (!value.trim()) return "Full name is required";
+    if (!/^[A-Za-z\s]+$/.test(value))
+      return "Only letters and spaces are allowed";
+    return "";
+  };
 
   const validateEmail = (value) => {
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-      return "Invalid email format (example: name@example.com)";
-    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value))
+      return "Please enter a valid email address";
     return "";
   };
 
@@ -53,21 +62,20 @@ export default function DonorLogin() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const emailErr = validateEmail(email);
-    setEmailError(emailErr);
+    const eErr = validateEmail(email);
+    setEmailError(eErr);
 
-    if (emailErr) return;
-
-    if (!isSignIn && !name.trim()) {
-      toast.error("Full name is required");
-      return;
+    let nErr = "";
+    if (!isSignIn) {
+      nErr = validateName(name);
+      setNameError(nErr);
     }
 
-    const pwdErrors = validatePassword(password);
-    setPasswordErrors(pwdErrors);
+    const pwdErrs = validatePassword(password);
+    setPasswordErrors(pwdErrs);
 
-    if (pwdErrors.length > 0) {
-      toast.error("Please fix password requirements");
+    if (eErr || nErr || pwdErrs.length > 0) {
+      toast.error("Please fix the highlighted errors");
       return;
     }
 
@@ -94,10 +102,7 @@ export default function DonorLogin() {
           email,
           password,
           options: {
-            data: {
-              name,
-              user_type: "donor",
-            },
+            data: { name, user_type: "donor" },
           },
         });
 
@@ -138,13 +143,19 @@ export default function DonorLogin() {
 
         <form onSubmit={handleSubmit}>
           {!isSignIn && (
-            <input
-              type="text"
-              placeholder="Full Name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-            />
+            <>
+              <input
+                type="text"
+                placeholder="Full Name"
+                value={name}
+                onChange={(e) => {
+                  setName(e.target.value);
+                  setNameError(validateName(e.target.value));
+                }}
+                className={nameError ? "input-error" : ""}
+              />
+              {nameError && <p className="error-text">{nameError}</p>}
+            </>
           )}
 
           {/* EMAIL */}
@@ -157,7 +168,6 @@ export default function DonorLogin() {
               setEmailError(validateEmail(e.target.value));
             }}
             className={emailError ? "input-error" : ""}
-            required
           />
           {emailError && <p className="error-text">{emailError}</p>}
 
@@ -172,7 +182,7 @@ export default function DonorLogin() {
                 setPasswordErrors(validatePassword(e.target.value));
               }}
               style={{ paddingRight: "42px" }}
-              required
+              className={passwordErrors.length ? "input-error" : ""}
             />
 
             <span
@@ -193,11 +203,11 @@ export default function DonorLogin() {
             </span>
           </div>
 
-          {/* PASSWORD REQUIREMENTS */}
+          {/* PASSWORD RULES */}
           {!isSignIn && passwordErrors.length > 0 && (
             <ul className="error-text">
-              {passwordErrors.map((err, index) => (
-                <li key={index}>{err}</li>
+              {passwordErrors.map((err, i) => (
+                <li key={i}>{err}</li>
               ))}
             </ul>
           )}
