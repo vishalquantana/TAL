@@ -11,42 +11,44 @@ export default function AdminLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
-  const [errors, setErrors] = useState({});
-  const [touched, setTouched] = useState({ name: false, email: false, password: false });
+  const [showPassword, setShowPassword] = useState(false);
+
+  const [emailError, setEmailError] = useState("");
+  const [passwordErrors, setPasswordErrors] = useState([]);
+  const [nameError, setNameError] = useState("");
+
   const navigate = useNavigate();
 
-  // ✅ Validation functions
-  const validateName = (value) => {
-    if (!value.trim()) {
-      return "❌ Full name is required";
-    }
-    const regex = /^[a-zA-Z\s]+$/;
-    if (!regex.test(value)) {
-      return "❌ Full name must contain only letters and spaces";
-    }
-    if (value.trim().length < 2) {
-      return "❌ Full name must be at least 2 characters long";
-    }
-    return "";
-  };
+  /* ---------------- VALIDATIONS ---------------- */
 
   const validateEmail = (value) => {
     const regex = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/;
-    if (!regex.test(value)) {
-      return "❌ Wrong email format (example: name@example.com)";
-    }
+    if (!regex.test(value)) return "Wrong email format (example: name@example.com)";
+    return "";
+  };
+
+  const validateName = (value) => {
+    if (!value.trim()) return "Full name is required";
+    if (!/^[a-zA-Z\s]+$/.test(value))
+      return "Name must contain only letters and spaces";
+    if (value.trim().length < 2)
+      return "Full name must be at least 2 characters";
     return "";
   };
 
   const validatePassword = (value) => {
     const errors = [];
-    if (!/[a-z]/.test(value)) errors.push("❌ Must include a lowercase letter");
-    if (!/[A-Z]/.test(value)) errors.push("❌ Must include an uppercase letter");
-    if (!/[0-9]/.test(value)) errors.push("❌ Must include a number");
-    if (!/[@$!%*?&]/.test(value)) errors.push("❌ Must include a special character (@$!%*?&)");
-    if (value.length < 8) errors.push("❌ Must be at least 8 characters long");
+    if (!/[a-z]/.test(value)) errors.push("Must include a lowercase letter");
+    if (!/[A-Z]/.test(value)) errors.push("Must include an uppercase letter");
+    if (!/[0-9]/.test(value)) errors.push("Must include a number");
+    if (!/[@$!%*?&]/.test(value))
+      errors.push("Must include a special character (@$!%*?&)");
+    if (value.length < 8)
+      errors.push("Must be at least 8 characters long");
     return errors;
   };
+
+  /* ---------------- SESSION CHECK ---------------- */
 
   useEffect(() => {
     const checkSession = async () => {
@@ -58,30 +60,23 @@ export default function AdminLogin() {
     checkSession();
   }, [navigate]);
 
-  useEffect(() => {
-    setErrors({});
-    setTouched({ name: false, email: false, password: false });
-  }, [isSignIn]);
+  /* ---------------- SUBMIT ---------------- */
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const newErrors = {};
-    if (isSignIn) {
-      const emailErr = validateEmail(email);
-      if (emailErr) newErrors.email = emailErr;
-      if (!password) newErrors.password = "Password is required";
-    } else {
-      const nameErr = validateName(name);
-      if (nameErr) newErrors.name = nameErr;
-      const emailErr = validateEmail(email);
-      if (emailErr) newErrors.email = emailErr;
-      const passErrs = validatePassword(password);
-      if (passErrs.length > 0) newErrors.password = passErrs;
-    }
+    const eErr = validateEmail(email);
+    const nErr = !isSignIn ? validateName(name) : "";
+    const pErrs = validatePassword(password);
 
-    setErrors(newErrors);
-    if (Object.keys(newErrors).length > 0) return;
+    setEmailError(eErr);
+    setNameError(nErr);
+    setPasswordErrors(pErrs);
+
+    if (eErr || nErr || pErrs.length > 0) {
+      toast.error("Please fix the highlighted errors");
+      return;
+    }
 
     try {
       if (isSignIn) {
@@ -97,7 +92,7 @@ export default function AdminLogin() {
           return;
         }
 
-        toast.success("Admin logged in!");
+        toast.success("Admin login successful 🎉");
         navigate("/admin-dashboard");
       } else {
         const { error } = await supabase.auth.signUp({
@@ -108,16 +103,20 @@ export default function AdminLogin() {
           },
         });
         if (error) throw error;
-        toast.success("Admin account created!");
+
+        toast.success("Admin account created 🎉");
+        setIsSignIn(true);
       }
     } catch (err) {
       toast.error(err.message);
     }
   };
 
+  /* ---------------- FORGOT PASSWORD ---------------- */
+
   const handleForgotPassword = async () => {
     if (!email) {
-      toast.error("Please enter your email first");
+      toast.error("Enter your email first");
       return;
     }
 
@@ -126,22 +125,15 @@ export default function AdminLogin() {
     });
 
     if (error) toast.error(error.message);
-    else toast.success("Password reset email sent");
+    else toast.success("Password reset email sent 📧");
   };
 
-  // ✅ Inline style (replaces CSS)
-  const forgotPasswordStyle = {
-    marginTop: "10px",
-    textAlign: "center",
-    color: "#6a5acd",
-    cursor: "pointer",
-    fontSize: "0.95rem",
-  };
+  /* ---------------- UI ---------------- */
 
   return (
     <div className="auth-container">
       <div className="auth-box">
-        <h1>{isSignIn ? "Sign In" : "Sign Up"}</h1>
+        <h1>{isSignIn ? "Admin Sign In" : "Admin Sign Up"}</h1>
 
         <form onSubmit={handleSubmit}>
           {!isSignIn && (
@@ -152,77 +144,66 @@ export default function AdminLogin() {
                 value={name}
                 onChange={(e) => {
                   setName(e.target.value);
-                  if (touched.name) {
-                    setErrors({ ...errors, name: validateName(e.target.value) });
-                  }
+                  setNameError(validateName(e.target.value));
                 }}
-                onBlur={() => {
-                  setTouched({ ...touched, name: true });
-                  setErrors({ ...errors, name: validateName(name) });
-                }}
-                className={errors.name ? "input-error" : ""}
-                required
+                className={nameError ? "input-error" : ""}
               />
-              {errors.name && (
-                <p className="error-text">{errors.name}</p>
-              )}
+              {nameError && <p className="error-text">{nameError}</p>}
             </>
           )}
 
           <input
             type="email"
-            placeholder="Email"
+            placeholder="Email Address"
             value={email}
             onChange={(e) => {
               setEmail(e.target.value);
-              if (touched.email) {
-                setErrors({ ...errors, email: validateEmail(e.target.value) });
-              }
+              setEmailError(validateEmail(e.target.value));
             }}
-            onBlur={() => {
-              setTouched({ ...touched, email: true });
-              setErrors({ ...errors, email: validateEmail(email) });
-            }}
-            className={errors.email ? "input-error" : ""}
-            required
+            className={emailError ? "input-error" : ""}
           />
-          {errors.email && (
-            <p className="error-text">{errors.email}</p>
-          )}
+          {emailError && <p className="error-text">{emailError}</p>}
 
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => {
-              setPassword(e.target.value);
-              if (touched.password) {
-                setErrors({ ...errors, password: validatePassword(e.target.value) });
-              }
-            }}
-            onBlur={() => {
-              setTouched({ ...touched, password: true });
-              setErrors({ ...errors, password: validatePassword(password) });
-            }}
-            className={errors.password ? "input-error" : ""}
-            required
-          />
-          {errors.password && (
+          {/* PASSWORD WITH EYE ICON */}
+          <div style={{ position: "relative" }}>
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="Password"
+              value={password}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                setPasswordErrors(validatePassword(e.target.value));
+              }}
+              className={passwordErrors.length ? "input-error" : ""}
+              style={{ paddingRight: "42px" }}
+            />
+            <span
+              onClick={() => setShowPassword(!showPassword)}
+              style={{
+                position: "absolute",
+                right: "12px",
+                top: "50%",
+                transform: "translateY(-50%)",
+                cursor: "pointer",
+                fontSize: "18px",
+                color: "#555",
+              }}
+              title={showPassword ? "Hide password" : "Show password"}
+            >
+              👁
+            </span>
+          </div>
+
+          {/* PASSWORD RULE FEEDBACK */}
+          {!isSignIn && passwordErrors.length > 0 && (
             <ul className="error-text">
-              {errors.password.map((err, index) => (
+              {passwordErrors.map((err, index) => (
                 <li key={index}>{err}</li>
               ))}
             </ul>
           )}
 
-          <button
-            type="submit"
-            disabled={
-              isSignIn
-                ? !email || !password
-                : !name || !email || !password
-            }
-          >
+          <button type="submit">
             {isSignIn ? "Sign In" : "Sign Up"}
           </button>
         </form>
@@ -236,10 +217,13 @@ export default function AdminLogin() {
 
         {isSignIn && (
           <p
-            style={forgotPasswordStyle}
+            style={{
+              marginTop: "10px",
+              textAlign: "center",
+              color: "#6a5acd",
+              cursor: "pointer",
+            }}
             onClick={handleForgotPassword}
-            onMouseOver={(e) => (e.target.style.textDecoration = "underline")}
-            onMouseOut={(e) => (e.target.style.textDecoration = "none")}
           >
             Forgot password?
           </p>
