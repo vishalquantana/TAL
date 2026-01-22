@@ -77,7 +77,10 @@ export default function StudentForm() {
     bank_name: "",
     bank_branch: "",
     ifsc_code: "",
-    special_remarks: ""
+    special_remarks: "",
+    volunteer_name: "",
+    academic_achievements: "",
+    non_academic_achievements: ""
   });
 
   const [files, setFiles] = useState({
@@ -145,6 +148,15 @@ export default function StudentForm() {
     if (name === "age") {
       if (value !== "" && (Number.isNaN(Number(value)) || Number(value) < 6)) {
         return "Age must be at least 6";
+      }
+      return "";
+    }
+
+    // Volunteer name: only alphabets and spaces
+    if (name === "volunteer_name") {
+      if (!value) return "Volunteer name is required";
+      if (!/^[a-zA-Z\s]+$/.test(value)) {
+        return "Only alphabets and spaces are allowed";
       }
       return "";
     }
@@ -348,7 +360,8 @@ export default function StudentForm() {
       { key: 'first_name', label: 'First Name' },
       { key: 'last_name', label: 'Last Name' },
       { key: 'email', label: 'Email' },
-      { key: 'contact', label: 'Parent Number' }
+      { key: 'contact', label: 'Parent Number' },
+      { key: 'volunteer_name', label: 'Volunteer Name' }
     ];
 
     const missing = mandatoryFields.filter(f => {
@@ -1076,11 +1089,21 @@ export default function StudentForm() {
         {/* --- Other Questions --- */}
         <div className="form-group">
           <label className="full-width">
-            Achievements
+            Academic Achievements
             <input
               type="text"
-              name="certificates"
-              value={formData.certificates}
+              name="academic_achievements"
+              value={formData.academic_achievements}
+              onChange={handleInputChange}
+            />
+          </label>
+
+          <label className="full-width">
+            Non-Academic Achievements
+            <input
+              type="text"
+              name="non_academic_achievements"
+              value={formData.non_academic_achievements}
               onChange={handleInputChange}
             />
           </label>
@@ -1147,9 +1170,29 @@ export default function StudentForm() {
           {renderUploadField("Fees Receipt (Upload / Text)", "fees_receipt")}
         </div>
 
+        {/* Volunteer Name */}
+        <div className="section">
+          <h2>5. Volunteer Name</h2>
+          <div className="form-group">
+            <label className="full-width">
+              <span className="field-label">Volunteer Name<span className="required">*</span></span>
+              <input
+                type="text"
+                name="volunteer_name"
+                value={formData.volunteer_name}
+                onChange={handleInputChange}
+                className={errors.volunteer_name ? "input-error" : ""}
+                placeholder="Enter volunteer name"
+                required
+              />
+              {errors.volunteer_name && <p className="error-text">{errors.volunteer_name}</p>}
+            </label>
+          </div>
+        </div>
+
         {/* Special Remarks */}
         <div className="section">
-          <h2>5. Special Remarks</h2>
+          <h2>6. Special Remarks</h2>
           <textarea name="special_remarks" value={formData.special_remarks} onChange={handleInputChange} placeholder="Any additional notes or comments" rows={4} style={{ width: "100%" }}></textarea>
         </div>
 
