@@ -399,7 +399,8 @@ export default function StudentForm() {
       { key: 'last_name', label: 'Last Name' },
       { key: 'email', label: 'Email' },
       { key: 'contact', label: 'Parent Number' },
-      { key: 'volunteer_name', label: 'Volunteer Name' }
+      { key: 'volunteer_name', label: 'Volunteer Name' },
+      { key: 'camp_date', label: 'Date of Camp' }
     ];
 
     const missing = mandatoryFields.filter(f => {
@@ -895,8 +896,8 @@ export default function StudentForm() {
               <input type="text" name="camp_name" value={formData.camp_name} onChange={handleInputChange} />
             </label>
             <label>
-              Date of Camp
-              <input type="date" name="camp_date" value={formData.camp_date} onChange={handleInputChange} />
+              Date of Camp<span className="required">*</span>
+              <input type="date" name="camp_date" value={formData.camp_date} onChange={handleInputChange} required />
             </label>
             <label>
               <span className="field-label">Address<span className="required">*</span></span>
