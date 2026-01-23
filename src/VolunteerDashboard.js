@@ -182,7 +182,7 @@ const handleEditClick = (form) => {
         {/* Header Section */}
         <div className="main-header">
           <button className="btn primary fill-form-btn" onClick={handleFillFormClick}>
-            <span>+</span>
+            
             New Form
           </button>
           
@@ -193,23 +193,20 @@ const handleEditClick = (form) => {
           {loading && (
             <div style={{padding: 16, color: '#6b7280'}}>Loading forms...</div>
           )}
-          {!loading && forms.length === 0 && (
-            <div style={{padding:16, textAlign:'center', color:'#6b7280'}}>
-              <div>No submitted forms found for this volunteer.</div>
-              <div style={{marginTop:8}}>If you expected forms, please ensure you're logged in or check the Supabase table for submissions.</div>
-            </div>
-          )}
+         
           {/* Forms Table */}
           <table className="forms-table">
             <thead>
               <tr>
                 <th>Form ID</th>
                 <th>Name</th>
-                <th>Date Submitted</th>
+                <th>Camp Name</th>
+                <th>Submitted Date</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
+              
               {forms.map(form => (
                 <tr key={form.id} className={form.id === selectedFormId ? "selected" : ""}>
                   <td onClick={() => handleFormClick(form.id)}>{form.displayId}</td>
@@ -236,6 +233,12 @@ const handleEditClick = (form) => {
             </tbody>
           </table>
         </div>
+         {!loading && forms.length === 0 && (
+            <div style={{padding:16, textAlign:'center', color:'#6b7280'}}>
+              <div>No submitted forms found for this volunteer.</div>
+              <div style={{marginTop:8}}></div>
+            </div>
+          )}
 
         {/* Form Details Section */}
         {selectedForm && (

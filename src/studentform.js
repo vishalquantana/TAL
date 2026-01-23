@@ -740,22 +740,22 @@ export default function StudentForm() {
     
     return (
       <div className="family-members-section">
-        <h3>Family Members Details</h3>
+        <h3>Family Details</h3>
         {Array.from({ length: num }, (_, index) => (
           <div key={index} className="family-member-card">
             <div className="form-group">
               <label>
-                <span className="field-label">Family Member {index + 1} Name<span className="required">*</span></span>
+                <span className="field-label"> Name<span className="required">*</span></span>
                 <input
                   type="text"
                   name={`family_member_name_${index}`}
                   value={formData.family_members_details[index]?.name || ""}
                   onChange={handleInputChange}
-                  placeholder="Enter family member name"
+                  placeholder="Enter Name"
                 />
               </label>
               <label>
-                <span className="field-label">Relationship to Student<span className="required">*</span></span>
+                <span className="field-label">Relationship to Applicant<span className="required">*</span></span>
                 <select
                   name={`family_member_relation_${index}`}
                   value={formData.family_members_details[index]?.relation || ""}
@@ -789,12 +789,12 @@ export default function StudentForm() {
     
     return (
       <div className="earning-members-section">
-        <h3>Earning Members Details</h3>
+        <h3>Details of Earning Family Members</h3>
         {Array.from({ length: num }, (_, index) => (
           <div key={index} className="earning-member-group">
             <div className="form-group">
               <label>
-                <span className="field-label">Earning Member {index + 1} Name<span className="required">*</span></span>
+                <span className="field-label">Name<span className="required">*</span></span>
                 <input
                   type="text"
                   name={`earning_member_name_${index}`}
@@ -831,10 +831,30 @@ export default function StudentForm() {
         </div>
       )}
 
+        {/* Volunteer Name */}
+        <div className="section">
+          <h2>1. Volunteer Details</h2>
+          <div className="form-group">
+            <label className="full-width">
+              <span className="field-label">Name<span className="required">*</span></span>
+              <input
+                type="text"
+                name="volunteer_name"
+                value={formData.volunteer_name}
+                onChange={handleInputChange}
+                className={errors.volunteer_name ? "input-error" : ""}
+                placeholder="Enter Name"
+                required
+              />
+              {errors.volunteer_name && <p className="error-text">{errors.volunteer_name}</p>}
+            </label>
+          </div>
+        </div>
+
       <form onSubmit={handleSubmit}>
         {/* Personal Data */}
         <div className="section">
-          <h2>1. Personal Data</h2>
+          <h2>2. Personal Data</h2>
           <div className="form-group">
             <label>
               <span className="field-label">First Name<span className="required">*</span></span>
@@ -920,7 +940,7 @@ export default function StudentForm() {
               {errors.contact && <p className="error-text">{errors.contact}</p>}
             </label>
             <label>
-              <span className="field-label">Whatsapp Number For Communication<span className="required">*</span></span>
+              <span className="field-label">Whatsapp Number(For Communication)<span className="required">*</span></span>
               <input
                 type="text"
                 name="whatsapp"
@@ -945,7 +965,7 @@ export default function StudentForm() {
               {errors.student_contact && <p className="error-text">{errors.student_contact}</p>}
             </label>
             <label>
-              <span className="field-label"> Enter Email For Further Communication<span className="required">*</span></span>
+              <span className="field-label">Email(For Further Communication)<span className="required">*</span></span>
               <input
                 type="email"
                 name="email"
@@ -960,7 +980,7 @@ export default function StudentForm() {
 
           {/* --- Single Parent Question --- */}
           <div className="form-group">
-            <label>Are you a single parent child?<span className="required">*</span></label>
+            <label>Are you currently being raised by a single parent or guardian?<span className="required">*</span></label>
 
             <div className="radio-inline">
               <label>
@@ -990,7 +1010,7 @@ export default function StudentForm() {
 
           <div className="form-group">
             <label className="full-width">
-              <span className="field-label">How many family members are there in total?<span className="required">*</span></span>
+              <span className="field-label">Total number of family members?(Including Yourself)<span className="required">*</span></span>
               <input
                 type="number"
                 name="num_family_members"
@@ -1008,7 +1028,7 @@ export default function StudentForm() {
             {errors.family_members && <p className="error-text">{errors.family_members}</p>}
             
             <label className="full-width">
-              <span className="field-label">How many earning members are there in the family?<span className="required">*</span></span>
+              <span className="field-label">Number of earning members in the family?<span className="required">*</span></span>
               <input 
                 type="number" 
                 name="num_earning_members" 
@@ -1029,7 +1049,7 @@ export default function StudentForm() {
 
         {/* Academic Data */}
         <div className="section">
-          <h2>2. Academic Data</h2>
+          <h2>3. Academic Data</h2>
           <div className="form-group">
             <label>
               <span className="field-label">Name of School/College/University<span className="required">*</span></span>
@@ -1089,7 +1109,7 @@ export default function StudentForm() {
         </div>
 
         {/* Other Details */}
-        <h2>3. Other Details</h2>
+        <h2>4. Other Details</h2>
 
         {/* --- Does she work to support her family? --- */}
         <div className="form-group">
@@ -1227,7 +1247,7 @@ export default function StudentForm() {
 
         {/* Document Upload */}
         <div className="section">
-          <h2>4. Document Upload (Size Limit: 50 MB)</h2>
+          <h2>5. Document Upload (Size Limit: 50 MB)</h2>
 
           {renderUploadField("School / College ID", "school_id")}
           {renderUploadField("Aadhaar Card", "aadhaar")}
@@ -1274,26 +1294,6 @@ export default function StudentForm() {
           </div>
 
           {renderUploadField("Fees Receipt (Upload / Text)", "fees_receipt")}
-        </div>
-
-        {/* Volunteer Name */}
-        <div className="section">
-          <h2>5. Volunteer Name</h2>
-          <div className="form-group">
-            <label className="full-width">
-              <span className="field-label">Volunteer Name<span className="required">*</span></span>
-              <input
-                type="text"
-                name="volunteer_name"
-                value={formData.volunteer_name}
-                onChange={handleInputChange}
-                className={errors.volunteer_name ? "input-error" : ""}
-                placeholder="Enter volunteer name"
-                required
-              />
-              {errors.volunteer_name && <p className="error-text">{errors.volunteer_name}</p>}
-            </label>
-          </div>
         </div>
 
         {/* Special Remarks */}

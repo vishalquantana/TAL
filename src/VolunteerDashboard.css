@@ -251,19 +251,23 @@
 }
 
 .volunteer-dashboard .fill-form-btn {
-  padding: 10px 24px;
-  background-color: #94ef57;
-  border: none;
-  border-radius: 8px;
-  color: white;
+  padding: 12px 10px;      /* smaller button */
+  font-size: 0.8rem;
+  min-width: unset;      /* 🔑 remove forced width */
+  width: auto;           /* 🔑 prevent full width */
+  height: auto;
+
+  background-color: #2A686B;
+  color: #ffffff;
+  border-radius: 6px;
   font-weight: 600;
-  cursor: pointer;
-  font-size: 0.95rem;
-  transition: all 0.2s ease;
-  display: flex;
+
+  display: inline-flex;  /* 🔑 stops stretching */
   align-items: center;
-  gap: 6px;
+  gap: 4px;
 }
+
+
 
 .volunteer-dashboard .fill-form-btn:hover {
   background: #235557;
@@ -518,9 +522,7 @@
     font-size: 1.3rem;
   }
 
-  .volunteer-dashboard .fill-form-btn {
-    width: 100%;
-  }
+  
 
   .volunteer-dashboard .forms-table th,
   .volunteer-dashboard .forms-table td {
@@ -536,5 +538,17 @@
 
   .volunteer-dashboard .table-wrapper {
     min-height: 300px;
+  }
+}
+@media (max-width: 768px) {
+  .volunteer-dashboard .table-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .volunteer-dashboard .fill-form-btn {
+    width: 100%;
+    justify-content: center;
   }
 }
