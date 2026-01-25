@@ -127,19 +127,23 @@ export default function StudentForm() {
 
     // Account number: digits only, 10-18 digits
     if (name === "account_no") {
-      if (!value || !/^\d{10,18}$/.test(value)) {
-        return "Account number must be 10 to 18 digits";
-      }
-      return "";
-    }
+  if (!value) return "";   // ✅ optional
+  if (!/^\d{10,18}$/.test(value)) {
+    return "Account number must be 10 to 18 digits";
+  }
+  return "";
+}
+
 
     // IFSC: 4 letters + 0 + 6 numbers (common pattern)
     if (name === "ifsc_code") {
-      if (!value || !/^[A-Z]{4}0[0-9]{6}$/.test(value)) {
-        return "Enter a valid IFSC code (e.g. ABCD0123456)";
-      }
-      return "";
-    }
+  if (!value) return "";   // ✅ optional
+  if (!/^[A-Z]{4}0[0-9]{6}$/.test(value)) {
+    return "Enter a valid IFSC code";
+  }
+  return "";
+}
+
 
     // Email proper validation
     if (name === "email") {
@@ -512,12 +516,7 @@ export default function StudentForm() {
     if (studentErr) newErrors.student_contact = studentErr;
 
     // Account number
-    const accErr = validateField("account_no", formData.account_no);
-    if (accErr) newErrors.account_no = accErr;
-
-    // IFSC
-    const ifscErr = validateField("ifsc_code", (formData.ifsc_code || "").toUpperCase());
-    if (ifscErr) newErrors.ifsc_code = ifscErr;
+   
 
     // Email
     const emailErr = validateField("email", formData.email);
@@ -1341,17 +1340,17 @@ export default function StudentForm() {
                   value={formData.account_no || ""}
                   onChange={handleInputChange}
                   className={errors.account_no ? "input-error" : ""}
-                  required
+                  
                 />
                 {errors.account_no && <p className="error-text">{errors.account_no}</p>}
               </label>
               <label>
                 <span className="field-label">Bank Name<span className="form-group"></span></span>
-                <input type="text" name="bank_name" value={formData.bank_name || ""} onChange={handleInputChange} required />
+                <input type="text" name="bank_name" value={formData.bank_name || ""} onChange={handleInputChange}  />
               </label>
               <label>
                 <span className="field-label">Branch<span className="form-group"></span></span>
-                <input type="text" name="bank_branch" value={formData.bank_branch || ""} onChange={handleInputChange} required />
+                <input type="text" name="bank_branch" value={formData.bank_branch || ""} onChange={handleInputChange}  />
               </label>
               <label>
                 <span className="field-label">Enter valid IFSC Code<span className="form-group"></span></span>
@@ -1361,7 +1360,7 @@ export default function StudentForm() {
                   value={formData.ifsc_code || ""}
                   onChange={handleInputChange}
                   className={errors.ifsc_code ? "input-error" : ""}
-                  required
+                  
                 />
                 {errors.ifsc_code && <p className="error-text">{errors.ifsc_code}</p>}
               </label>
