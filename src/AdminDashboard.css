@@ -72,10 +72,9 @@
   display: flex;
   flex-direction: column;
   height: 100vh;
-  overflow-y: auto;
   width: calc(100% - 260px);
   position: relative;
-  padding-bottom: 20px;
+  overflow-y: auto;
 }
 .admin-header{
   display: flex;
@@ -166,13 +165,72 @@
   padding: 24px 32px;
   flex: 1;
   overflow-y: auto;
-  max-width: 1400px;
-  margin: 0 auto;
   width: 100%;
   display: flex;
   flex-direction: column;
   gap: 24px;
+  min-height: 0; /* Allows scrolling inside */
 }
+
+/* Override for settings section to allow full expansion */
+.admin-content > .settings-section {
+  flex: 1;
+  min-height: 0; /* Allows it to shrink if needed */
+  width: 100%; /* Ensure full width */
+}
+
+/* Make sure settings grid fills available space */
+.settings-section .settings-grid {
+  flex: 1;
+  width: 100%;
+  display: grid;
+  grid-template-rows: 1fr; /* Distribute evenly */
+}
+
+/* Specific styling for settings section to fill available space */
+.settings-section {
+  width: 100%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0; /* Allows scrolling inside if content is too tall */
+  height: auto; /* Allow natural height adjustment */
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  width: 100%;
+}
+
+.section-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.settings-grid{
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 16px;
+  width: 100%;
+  flex: 1;
+  flex-wrap: wrap;
+}
+.settings-card{
+  background:#fff;
+  padding:18px;
+  border-radius:10px;
+  box-shadow:0 4px 12px rgba(20,24,40,0.04);
+  min-width: 280px;
+  flex: 1;
+}
+.settings-form{display:flex;flex-direction:column;gap:12px}
+.form-input{width:100%;padding:8px 10px;border-radius:6px;border:1px solid #e5e7eb}
+.checkbox-label{display:flex;align-items:center;gap:8px}
+
 .cards-row{
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -585,7 +643,7 @@
 .chart-placeholder{height:200px;background:#f8fafa;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#6b7280;border:2px dashed #eef2f6}
 
 /* Settings */
-.settings-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.settings-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;width:100%;flex:1;}
 .settings-card{background:#fff;padding:18px;border-radius:10px;box-shadow:0 4px 12px rgba(20,24,40,0.04)}
 .settings-form{display:flex;flex-direction:column;gap:12px}
 .form-input{width:100%;padding:8px 10px;border-radius:6px;border:1px solid #e5e7eb}

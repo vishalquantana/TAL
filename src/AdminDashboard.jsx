@@ -10,11 +10,30 @@ export default function AdminDashboard() {
   const [viewDonor, setViewDonor] = useState(null);
   const [lastFetch, setLastFetch] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [currentUser, setCurrentUser] = useState(null);
+  const [adminName, setAdminName] = useState("");
+  const [contactNumber, setContactNumber] = useState("");
+  const [emailNotifications, setEmailNotifications] = useState(true);
+  const [smsAlerts, setSmsAlerts] = useState(true);
+  const [systemNotifications, setSystemNotifications] = useState(true);
+  const [defaultLanguage, setDefaultLanguage] = useState("English");
+  const [timeZone, setTimeZone] = useState("IST (UTC+5:30)");
 
-  // Fetch real data from Supabase
+  // Fetch user and real data from Supabase
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchUserData = async () => {
       try {
+        // Get current user session
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          setCurrentUser(session.user);
+          // Initialize settings with current user data
+          setAdminName(session.user.user_metadata?.name || session.user.email?.split('@')[0] || "");
+        } else {
+          // If no session, redirect to login
+          navigate('/');
+        }
+
         // Fetch student form submissions
         const { data: studentData, error: studentError } = await supabase
           .from('admin_student_info')
@@ -99,7 +118,7 @@ export default function AdminDashboard() {
       }
     };
 
-    fetchData();
+    fetchUserData();
   }, []);
 
   // filters now include stream (course)
@@ -326,8 +345,46 @@ const handleNotApprove = async (studentId) => {
     URL.revokeObjectURL(url);
   };
 
-  const handleSaveSettings = () => {
-    alert('Settings saved (demo)');
+  const handleSaveSettings = async () => {
+    try {
+      // Update user metadata with the new admin name
+      if (currentUser) {
+        const { error } = await supabase.auth.updateUser({
+          data: {
+            name: adminName,
+            contact_number: contactNumber,
+            preferences: {
+              email_notifications: emailNotifications,
+              sms_alerts: smsAlerts,
+              system_notifications: systemNotifications,
+              default_language: defaultLanguage,
+              time_zone: timeZone
+            }
+          }
+        });
+
+        if (error) {
+          console.error('Error updating user settings:', error);
+          alert('Error saving settings: ' + error.message);
+          return;
+        }
+
+        // Update the current user state with the new name
+        const updatedUser = {
+          ...currentUser,
+          user_metadata: {
+            ...currentUser.user_metadata,
+            name: adminName
+          }
+        };
+        setCurrentUser(updatedUser);
+
+        alert('Settings saved successfully!');
+      }
+    } catch (error) {
+      console.error('Error saving settings:', error);
+      alert('Error saving settings: ' + error.message);
+    }
   };
 
   // When opening edit modal, create a shallow copy so editing doesn't mutate state directly
@@ -834,15 +891,33 @@ const handleNotApprove = async (studentId) => {
                   <div className="settings-form">
                     <label>
                       Admin Name
-                      <input type="text" className="form-input" defaultValue="Admin User" />
+                      <input 
+                        type="text" 
+                        className="form-input" 
+                        value={adminName}
+                        onChange={(e) => setAdminName(e.target.value)}
+                        placeholder="Enter admin name" 
+                      />
                     </label>
                     <label>
                       Email Address
-                      <input type="email" className="form-input" defaultValue="admin@touchalife.org" />
+                      <input 
+                        type="email" 
+                        className="form-input" 
+                        value={currentUser?.email || ""} 
+                        readOnly 
+                        placeholder="Email cannot be changed" 
+                      />
                     </label>
                     <label>
                       Contact Number
-                      <input type="tel" className="form-input" defaultValue="+91 98765 43210" />
+                      <input 
+                        type="tel" 
+                        className="form-input" 
+                        value={contactNumber}
+                        onChange={(e) => setContactNumber(e.target.value)}
+                        placeholder="Enter contact number" 
+                      />
                     </label>
                   </div>
                 </div>
@@ -851,13 +926,25 @@ const handleNotApprove = async (studentId) => {
                   <h4>Notification Preferences</h4>
                   <div className="settings-form">
                     <label className="checkbox-label">
-                      <input type="checkbox" defaultChecked /> Email Notifications
+                      <input 
+                        type="checkbox" 
+                        checked={emailNotifications}
+                        onChange={(e) => setEmailNotifications(e.target.checked)} 
+                      /> Email Notifications
                     </label>
                     <label className="checkbox-label">
-                      <input type="checkbox" defaultChecked /> SMS Alerts
+                      <input 
+                        type="checkbox" 
+                        checked={smsAlerts}
+                        onChange={(e) => setSmsAlerts(e.target.checked)} 
+                      /> SMS Alerts
                     </label>
                     <label className="checkbox-label">
-                      <input type="checkbox" defaultChecked /> System Notifications
+                      <input 
+                        type="checkbox" 
+                        checked={systemNotifications}
+                        onChange={(e) => setSystemNotifications(e.target.checked)} 
+                      /> System Notifications
                     </label>
                   </div>
                 </div>
@@ -867,14 +954,22 @@ const handleNotApprove = async (studentId) => {
                   <div className="settings-form">
                     <label>
                       Default Language
-                      <select className="form-input">
+                      <select 
+                        className="form-input"
+                        value={defaultLanguage}
+                        onChange={(e) => setDefaultLanguage(e.target.value)}
+                      >
                         <option>English</option>
                         <option>Hindi</option>
                       </select>
                     </label>
                     <label>
                       Time Zone
-                      <select className="form-input">
+                      <select 
+                        className="form-input"
+                        value={timeZone}
+                        onChange={(e) => setTimeZone(e.target.value)}
+                      >
                         <option>IST (UTC+5:30)</option>
                       </select>
                     </label>
