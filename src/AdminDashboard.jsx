@@ -38,8 +38,6 @@ export default function AdminDashboard() {
        const { data: studentData, error: studentError } = await supabase
   .from('admin_student_info')
   .select('*')
- .or('status.eq.Pending,status.is.null')
- // <-- ignore approved/rejected
   .order('created_at', { ascending: false });
 
         // Save raw fetch result for debugging
@@ -174,35 +172,37 @@ export default function AdminDashboard() {
     setStudents((prev) => prev.filter((p) => p.id !== id));
   };
 
-const handleApprove = async (studentId) => {
+const handleApprove = async (id) => {
   const { error } = await supabase
     .from('admin_student_info')
-    .update({ status: 'Eligible' })
-    .eq('student_id', studentId);
+    .delete()
+    .eq('id', id);
 
   if (error) {
-    console.error('Approve failed:', error);
+    console.error(error);
     alert('Approval failed');
   } else {
-    setStudents(prev => prev.filter(s => s.student_id !== studentId));
+    setStudents(prev => prev.filter(s => s.id !== id));
     alert('Student approved ✅');
   }
 };
 
-const handleNotApprove = async (studentId) => {
+const handleNotApprove = async (id) => {
   const { error } = await supabase
     .from('admin_student_info')
-    .update({ status: 'Not Eligible' })
-    .eq('student_id', studentId);
+    .delete()
+    .eq('id', id);
 
   if (error) {
-    console.error('Rejection failed:', error);
+    console.error(error);
     alert('Rejection failed');
   } else {
-    setStudents(prev => prev.filter(s => s.student_id !== studentId));
-    alert('Student marked Not Eligible ❌');
+    setStudents(prev => prev.filter(s => s.id !== id));
+    alert('Student rejected ❌');
   }
 };
+
+
 
 
   const handleEditSave = (data) => {
@@ -594,11 +594,11 @@ const handleNotApprove = async (studentId) => {
                               <span className="tooltiptext">View</span>
                             </div>
                             <div className="tooltip">
-                              <button className="btn small icon-btn" onClick={() => handleApprove(s.student_id)} style={{backgroundColor: '#e8f5e8', color: '#2e7d32', borderColor: '#2e7d32'}}>✅</button>
+                              <button className="btn small icon-btn" onClick={() => handleApprove(s.id)} style={{backgroundColor: '#e8f5e8', color: '#2e7d32', borderColor: '#2e7d32'}}>✅</button>
                               <span className="tooltiptext">Approved</span>
                             </div>
                             <div className="tooltip">
-                              <button className="btn small icon-btn" onClick={() => handleNotApprove(s.student_id)} style={{backgroundColor: '#ffebee', color: '#c62828', borderColor: '#c62828'}}>❌</button>
+                              <button className="btn small icon-btn" onClick={() => handleNotApprove(s.id)} style={{backgroundColor: '#ffebee', color: '#c62828', borderColor: '#c62828'}}>❌</button>
                               <span className="tooltiptext">Not Approved</span>
                             </div>
                           </div>
