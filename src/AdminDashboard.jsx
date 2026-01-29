@@ -18,6 +18,10 @@ export default function AdminDashboard() {
   const [systemNotifications, setSystemNotifications] = useState(true);
   const [defaultLanguage, setDefaultLanguage] = useState("English");
   const [timeZone, setTimeZone] = useState("IST (UTC+5:30)");
+  const [eligibleStudents, setEligibleStudents] = useState([]);
+  const [loadingEligible, setLoadingEligible] = useState(false);
+  const [eligibleCount, setEligibleCount] = useState(0);
+  // const [viewEligibleStudent, setViewEligibleStudent] = useState(null);
 
   // Fetch user and real data from Supabase
   useEffect(() => {
@@ -119,19 +123,20 @@ export default function AdminDashboard() {
       }
     };
 
-    fetchUserData();
-  }, []);
+   fetchUserData();
+fetchEligibleCount();
+}, []);
+
 
   // filters now include stream (course)
   const [filters, setFilters] = useState({ class: "", donor: "", feeStatus: "", stream: "" });
   const [query, setQuery] = useState("");
 
   const [activeSection, setActiveSection] = useState("overview");
-
-  // modal state
   const [viewStudent, setViewStudent] = useState(null);
   const [editStudent, setEditStudent] = useState(null);
   const [broadcastOpen, setBroadcastOpen] = useState(false);
+  const [viewEligibleStudent, setViewEligibleStudent] = useState(null);
 
   const totals = useMemo(() => {
     const totalStudents = students.length;
@@ -159,6 +164,68 @@ export default function AdminDashboard() {
       return true;
     });
   }, [students, filters, query]);
+const fetchEligibleCount = async () => {
+  const { count, error } = await supabase
+    .from("eligible_students")
+    .select("*", { count: "exact", head: true });
+
+  if (error) {
+    console.error("Error fetching eligible count:", error);
+  } else {
+    setEligibleCount(count || 0);
+  }
+};
+
+  const fetchEligibleStudents = async () => {
+    setLoadingEligible(true);
+    try {
+      const { data, error } = await supabase
+        .from('eligible_students')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching eligible students:', error);
+        alert('Error fetching eligible students: ' + error.message);
+      } else {
+setEligibleStudents(data || []);
+setEligibleCount(data?.length || 0);
+      }
+    } catch (err) {
+      console.error('Error:', err);
+      alert('Error fetching data');
+    } finally {
+      setLoadingEligible(false);
+    }
+  };
+
+  const handleDownloadEligibleReport = () => {
+    if (eligibleStudents.length === 0) {
+      alert('No eligible students to export');
+      return;
+    }
+
+    const rows = [
+      "id,student_name,email,contact,education,year,school,college,created_at",
+      ...eligibleStudents.map(s => 
+        `${s.id},"${s.student_name || ''}","${s.email || ''}","${s.contact || ''}","${s.education || ''}","${s.year || ''}","${s.school || ''}","${s.college || ''}","${s.created_at || ''}"`
+      )
+    ];
+    
+    const blob = new Blob([rows.join('\n')], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'eligible-students-report.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+    alert('Report downloaded successfully!');
+  };
+
+  const handleDelete = (id) => {
+    if (!window.confirm("Delete this student record?")) return;
+    setStudents((prev) => prev.filter((p) => p.id !== id));
+  };
 
   // helpers
   const uniqueCourses = useMemo(() => {
@@ -166,11 +233,6 @@ export default function AdminDashboard() {
     students.forEach(s => s.course && set.add(s.course));
     return Array.from(set);
   }, [students]);
-
-  const handleDelete = (id) => {
-    if (!window.confirm("Delete this student record?")) return;
-    setStudents((prev) => prev.filter((p) => p.id !== id));
-  };
 
 const handleApprove = async (id) => {
   const { error } = await supabase
@@ -184,6 +246,8 @@ const handleApprove = async (id) => {
   } else {
     setStudents(prev => prev.filter(s => s.id !== id));
     alert('Student approved ✅');
+    fetchEligibleCount();
+
   }
 };
 
@@ -199,6 +263,8 @@ const handleNotApprove = async (id) => {
   } else {
     setStudents(prev => prev.filter(s => s.id !== id));
     alert('Student rejected ❌');
+    fetchEligibleCount();
+
   }
 };
 
@@ -830,7 +896,69 @@ const handleNotApprove = async (id) => {
                   <div className="chart-placeholder">Contribution Analysis</div>
                   <button className="btn small" onClick={() => handleDownloadSpecificReport('donor')}>Download Report</button>
                 </div>
+                {/* Eligible Students Report */}
+                <div className="report-card">
+                  <h4>Eligible Students</h4>
+                  <div className="report-meta">
+                     <p>Total Eligible: <strong>{eligibleCount}</strong></p>
+                  </div>
+                  <div className="report-actions">
+                    <button className="btn small" onClick={fetchEligibleStudents} disabled={loadingEligible}>
+                      {loadingEligible ? 'Loading...' : 'View Data'}
+                    </button>
+                    <button className="btn small" onClick={handleDownloadEligibleReport} disabled={eligibleStudents.length === 0}>
+                      Download Report
+                    </button>
+                  </div>
+                </div>
               </div>
+
+              {/* Eligible Students Table */}
+              {eligibleStudents.length > 0 && (
+                <div className="table-wrap" style={{marginTop: '24px'}}>
+                  <h3>Eligible Students List</h3>
+                  <table className="data-table">
+                    <thead>
+                      <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Contact</th>
+                        <th>Education</th>
+                        {/* <th>Year</th> */}
+                        <th>School/College</th>
+                        <th>Date Added</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {eligibleStudents.map(s => (
+                        <tr key={s.id}>
+                          <td>{s.student_name || s.full_name}</td>
+                          <td>{s.email || s.email}</td>
+                          <td>{s.contact || s.contact}</td>
+                          <td>{s.education || s.class}</td>
+                          {/* <td>{s.year || '-'}</td> */}
+                          <td>{s.school || s.college || '-'}</td>
+                          <td>
+                            {s.created_at 
+                              ? new Date(s.created_at).toLocaleDateString() 
+                              : '-'
+                            }
+                          </td>
+                          <td>
+                            <button 
+                              className="btn small" 
+                              onClick={() => setViewEligibleStudent(s)}
+                            >
+                              View
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </section>
           )}
 
@@ -1094,6 +1222,37 @@ const handleNotApprove = async (id) => {
                 <button className="btn" type="button" onClick={() => setBroadcastOpen(false)}>Close</button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {viewEligibleStudent && (
+        <div className="modal-overlay" onClick={() => setViewEligibleStudent(null)}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <h3>Eligible Student Details</h3>
+            <div className="view-grid">
+              <p><strong>Full Name:</strong> {viewEligibleStudent.student_name || '-'}</p>
+              <p><strong>Email:</strong> {viewEligibleStudent.email || '-'}</p>
+              <p><strong>Contact:</strong> {viewEligibleStudent.contact || '-'}</p>
+              <p><strong>Education Level:</strong> {viewEligibleStudent.education || '-'}</p>
+              <p><strong>Year:</strong> {viewEligibleStudent.year || '-'}</p>
+              <p><strong>School:</strong> {viewEligibleStudent.school || '-'}</p>
+              <p><strong>College:</strong> {viewEligibleStudent.college || '-'}</p>
+              <p><strong>Date Added:</strong> {
+                viewEligibleStudent.created_at 
+                  ? new Date(viewEligibleStudent.created_at).toLocaleString()
+                  : '-'
+              }</p>
+              {viewEligibleStudent.student_id && (
+                <p><strong>Student ID:</strong> {viewEligibleStudent.student_id}</p>
+              )}
+              {viewEligibleStudent.reason && (
+                <p><strong>Eligibility Reason:</strong> {viewEligibleStudent.reason}</p>
+              )}
+            </div>
+            <div style={{display:'flex',gap:8,marginTop:12}}>
+              <button className="btn primary" onClick={() => setViewEligibleStudent(null)}>Close</button>
+            </div>
           </div>
         </div>
       )}
