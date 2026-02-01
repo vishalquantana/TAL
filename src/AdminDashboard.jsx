@@ -201,6 +201,7 @@ const fetchNonEligibleCount = async () => {
       const { data, error } = await supabase
         .from('eligible_students')
         .select('*')
+        .eq('status', 'Pending')
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -302,36 +303,41 @@ setEligibleCount(data?.length || 0);
 const handleApprove = async (id) => {
   const { error } = await supabase
     .from('admin_student_info')
-    .delete()
+    .update({ status: 'Eligible' })
     .eq('id', id);
 
   if (error) {
     console.error(error);
     alert('Approval failed');
-  } else {
-    setStudents(prev => prev.filter(s => s.id !== id));
-    alert('Student approved ✅');
-    fetchEligibleCount();
-
+    return;
   }
+
+  // 👇 remove from UI immediately
+  setStudents(prev => prev.filter(s => s.id !== id));
+
+  alert('Student approved ✅');
 };
+
 
 const handleNotApprove = async (id) => {
   const { error } = await supabase
     .from('admin_student_info')
-    .delete()
+    .update({ status: 'Not Eligible' })
     .eq('id', id);
 
   if (error) {
     console.error(error);
     alert('Rejection failed');
-  } else {
-    setStudents(prev => prev.filter(s => s.id !== id));
-    alert('Student rejected ❌');
-    fetchEligibleCount();
-
+    return;
   }
+
+  // remove from UI
+  setStudents(prev => prev.filter(s => s.id !== id));
+
+  alert('Student rejected ❌');
 };
+
+
 
 
 
