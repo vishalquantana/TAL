@@ -1054,7 +1054,7 @@ has_scholarship: "",
               <input type="date" name="camp_date" value={formData.camp_date} onChange={handleInputChange} required />
             </label>
             <label>
-              <span className="field-label">Address<span className="required">*</span></span>
+              <span className="field-label">Student's Address<span className="required">*</span></span>
               <input type="text" name="address" value={formData.address} onChange={handleInputChange} required />
             </label>
           </div>
@@ -1150,7 +1150,7 @@ has_scholarship: "",
                 name="num_family_members"
                 value={formData.num_family_members}
                 onChange={handleInputChange}
-                min="0"
+                min="1"
                 max="15"
                 placeholder="Enter total number of family members"
                 required
@@ -1279,7 +1279,7 @@ has_scholarship: "",
 
           {formData.does_work === "YES" && (
             <label className="full-width">
-              What kind of job does she do?
+              What kind of job does she do?<span className="required">*</span>
               <input
                 type="text"
                 name="job"
