@@ -519,7 +519,7 @@ const handleNotApprove = async (id) => {
 
       <div className="admin-main">
         <header className="admin-header">
-          <h2>{activeSection === "overview" ? "Dashboard Overview" : activeSection === "manage" ? "Manage Beneficiaries" : activeSection === "mapping" ? "Donor Mapping (Under Construction)" : activeSection === "fees" ? "Fee Tracking (Under Construction)" : activeSection === "broadcast " ? "Alerts & Broadcast (Under Construction)" : activeSection === "reports" ? "Reports & Exports" : "Settings"}</h2>
+          <h2>{activeSection === "overview" ? "Dashboard Overview" : activeSection === "manage" ? "Manage Beneficiaries" : activeSection === "mapping" ? "Donor Mapping (Under Construction)" : activeSection === "fees" ? "Fee Tracking (Under Construction)" : activeSection === "broadcast" ? "Alerts & Broadcast (Under Construction)" : activeSection === "reports" ? "Reports & Exports" : "Settings"}</h2>
           <div className="header-actions">
             <input placeholder="Search students or college..." value={query} onChange={(e) => setQuery(e.target.value)} />
             <button className="btn primary" onClick={() => setBroadcastOpen(true)}>New Broadcast</button>
@@ -1165,7 +1165,8 @@ const handleNotApprove = async (id) => {
                 </div>
                 
                 <div className="settings-card">
-                  <h4>Notification Preferences</h4>
+                  <h4>Notification Preferences</h4> 
+                  <h4>(Under Construction)</h4>
                   <div className="settings-form">
                     <label className="checkbox-label">
                       <input 
@@ -1192,7 +1193,8 @@ const handleNotApprove = async (id) => {
                 </div>
 
                 <div className="settings-card">
-                  <h4>System Preferences</h4>
+                  <h4>System Preferences</h4> 
+                  <h4>(Under Construction)</h4>
                   <div className="settings-form">
                     <label>
                       Default Language
