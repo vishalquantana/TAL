@@ -519,7 +519,7 @@ const handleNotApprove = async (id) => {
 
       <div className="admin-main">
         <header className="admin-header">
-          <h2>{activeSection === "overview" ? "Dashboard Overview" : activeSection === "manage" ? "Manage Beneficiaries" : activeSection === "mapping" ? "Donor Mapping" : activeSection === "fees" ? "Fee Tracking" : activeSection === "broadcast" ? "Alerts & Broadcast" : activeSection === "reports" ? "Reports & Exports" : "Settings"}</h2>
+          <h2>{activeSection === "overview" ? "Dashboard Overview" : activeSection === "manage" ? "Manage Beneficiaries" : activeSection === "mapping" ? "Donor Mapping (Under Construction)" : activeSection === "fees" ? "Fee Tracking (Under Construction)" : activeSection === "broadcast " ? "Alerts & Broadcast (Under Construction)" : activeSection === "reports" ? "Reports & Exports" : "Settings"}</h2>
           <div className="header-actions">
             <input placeholder="Search students or college..." value={query} onChange={(e) => setQuery(e.target.value)} />
             <button className="btn primary" onClick={() => setBroadcastOpen(true)}>New Broadcast</button>
@@ -571,7 +571,7 @@ const handleNotApprove = async (id) => {
                 </div>
               </section>
               
-              {/* Quick Stats Section */}
+              {/*
               <section className="quick-stats">
                 <div className="stat-card">
                   <h3>Recent Activity</h3>
@@ -599,7 +599,7 @@ const handleNotApprove = async (id) => {
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="stat-card">
                   <h3>Fee Status Distribution</h3>
                   <div className="status-grid">
@@ -626,7 +626,7 @@ const handleNotApprove = async (id) => {
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="stat-card">
                   <h3>Upcoming Deadlines</h3>
                   <div className="deadline-list">
@@ -654,8 +654,9 @@ const handleNotApprove = async (id) => {
                   </div>
                 </div>
               </section>
+              */}
             </>
-          )}
+          )} 
 
           {/* Manage Beneficiaries */}
           {activeSection === "manage" && (
@@ -948,7 +949,7 @@ const handleNotApprove = async (id) => {
           {activeSection === "reports" && (
             <section className="reports-section">
               <div className="section-header">
-                <h3>Reports & Analytics</h3>
+                <h3>Reports & Analytics </h3>
                 <div className="section-actions">
                   <button className="btn" onClick={handleGenerateReport}>Generate Custom Report</button>
                 </div>
@@ -957,13 +958,15 @@ const handleNotApprove = async (id) => {
               <div className="reports-grid">
                 <div className="report-card">
                   <h4>Financial Overview</h4>
+                  <h4>(Under Construction)</h4>
                   <div className="chart-placeholder">Fund Utilization Chart</div>
                   <button className="btn small" onClick={() => handleDownloadSpecificReport('financial')}>Download Report</button>
                 </div>
 
                 <div className="report-card">
                   <h4>Donor Contributions</h4>
-                  <div className="chart-placeholder">Contribution Analysis</div>
+                  <h4>(Under Construction)</h4>
+                  <div className="chart-placeholder">Contribution Analysis </div>
                   <button className="btn small" onClick={() => handleDownloadSpecificReport('donor')}>Download Report</button>
                 </div>
                 {/* Eligible Students Report */}
