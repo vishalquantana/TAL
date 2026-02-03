@@ -548,7 +548,7 @@ const handleNotApprove = async (id) => {
                 <div className="card">
                   <div className="card-icon money-icon">💰</div>
                   <div className="card-content">
-                    <div className="card-title">Fees Collected</div>
+                    <div className="card-title">Donation  Collected</div>
                     <div className="card-value">₹{totals.feesCollected}</div>
                     <div className="card-trend positive">↑ 8% from last month</div>
                   </div>
@@ -756,7 +756,8 @@ const handleNotApprove = async (id) => {
             </section>
           )}
 
-          {/* Donor Mapping */}
+         {/* 
+         // Donor Mapping 
           {activeSection === "mapping" && (
             <section className="mapping-section">
               <div className="section-header">
@@ -809,8 +810,9 @@ const handleNotApprove = async (id) => {
               </div>
             </section>
           )}
+          */}
 
-          {/* Fee Tracking */}
+          {/* Fee Tracking 
           {activeSection === "fees" && (
             <section className="fees-section">
               <div className="section-header">
@@ -848,7 +850,7 @@ const handleNotApprove = async (id) => {
                       <th>Total Fee</th>
                       <th>Paid Amount</th>
                       <th>Due Date</th>
-                      <th>Paid Date</th> {/* NEW */}
+                      <th>Paid Date</th> // NEW *
                       <th>Status</th>
                       <th>Actions</th>
                     </tr>
@@ -860,7 +862,7 @@ const handleNotApprove = async (id) => {
                         <td>₹5,000</td>
                         <td>₹{s.feeStatus === 'Paid' ? '5,000' : s.feeStatus === 'Partial' ? '2,500' : '0'}</td>
                         <td>Nov 30, 2025</td>
-                        <td>{s.paidDate ? s.paidDate : "-"}</td> {/* show paidDate */}
+                        <td>{s.paidDate ? s.paidDate : "-"}</td> // show paidDate 
                         <td>
                           <span className={`status-badge ${s.feeStatus.toLowerCase()}`}>
                             {s.feeStatus}
@@ -877,8 +879,8 @@ const handleNotApprove = async (id) => {
               </div>
             </section>
           )}
-
-          {/* Broadcast */}
+*/}
+          {/* Broadcast 
           {activeSection === "broadcast" && (
             <section className="broadcast-section">
               <div className="section-header">
@@ -940,6 +942,7 @@ const handleNotApprove = async (id) => {
               </div>
             </section>
           )}
+            */}
 
           {/* Reports */}
           {activeSection === "reports" && (
