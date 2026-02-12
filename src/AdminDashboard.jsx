@@ -167,7 +167,7 @@ export default function AdminDashboard() {
 
         // Fetch fee payment summary
         try {
-          const { data: summaryResp } = await (await import("axios")).default.get("http://localhost:4000/api/fee-payments/summary");
+          const { data: summaryResp } = await (await import("axios")).default.get("/api/fee-payments/summary");
           if (summaryResp?.data) setFeeSummary(summaryResp.data);
         } catch (e) {
           console.error("Fee summary fetch error:", e);
@@ -623,7 +623,7 @@ const handleNotApprove = async (id) => {
       const { data: refreshedFees } = await supabase.from("fee_payments").select("*");
       if (refreshedFees) setFeePayments(refreshedFees);
       try {
-        const { data: summaryResp } = await (await import("axios")).default.get("http://localhost:4000/api/fee-payments/summary");
+        const { data: summaryResp } = await (await import("axios")).default.get("/api/fee-payments/summary");
         if (summaryResp?.data) setFeeSummary(summaryResp.data);
       } catch (e) { console.error(e); }
       setNewPaymentForm({ student_id: "", amount: "", payment_date: "", payment_method: "cash", notes: "" });
@@ -647,7 +647,7 @@ const handleNotApprove = async (id) => {
     if (!broadcastTitle) { alert("Title is required"); return; }
     try {
       const { data: resp } = await (await import("axios")).default.post(
-        "http://localhost:4000/api/notifications/broadcast",
+        "/api/notifications/broadcast",
         {
           recipient_role: broadcastRecipient === "all" ? null : broadcastRecipient,
           title: broadcastTitle,
@@ -692,8 +692,8 @@ const handleNotApprove = async (id) => {
       if (reportStartDate) params.set("start_date", reportStartDate);
       if (reportEndDate) params.set("end_date", reportEndDate);
       const [feeRes, donationRes] = await Promise.all([
-        axios.get(`http://localhost:4000/api/fee-payments/summary?${params}`),
-        axios.get(`http://localhost:4000/api/donations/summary?${params}`),
+        axios.get(`/api/fee-payments/summary?${params}`),
+        axios.get(`/api/donations/summary?${params}`),
       ]);
       if (feeRes.data?.data) setFilteredFeeSummary(feeRes.data.data);
       if (donationRes.data?.data) setFilteredDonationSummary(donationRes.data.data);
@@ -1028,7 +1028,7 @@ const handleNotApprove = async (id) => {
                         <td>
                           <div style={{display: 'flex', flexDirection: 'column', gap: '4px'}}>
                             <div className="tooltip">
-                              <button className="btn small icon-btn" onClick={async () => { setViewStudent(s); try { const axios = (await import("axios")).default; const { data: docsResp } = await axios.get(`http://localhost:4000/api/documents?student_id=${s.id}`); setViewStudentDocs(docsResp?.data || []); } catch(e) { setViewStudentDocs([]); } }} style={{backgroundColor: '#e3f2fd', color: '#1976d2', borderColor: '#1976d2'}}>👁️</button>
+                              <button className="btn small icon-btn" onClick={async () => { setViewStudent(s); try { const axios = (await import("axios")).default; const { data: docsResp } = await axios.get(`/api/documents?student_id=${s.id}`); setViewStudentDocs(docsResp?.data || []); } catch(e) { setViewStudentDocs([]); } }} style={{backgroundColor: '#e3f2fd', color: '#1976d2', borderColor: '#1976d2'}}>👁️</button>
                               <span className="tooltiptext">View</span>
                             </div>
                             <div className="tooltip">
@@ -1889,7 +1889,7 @@ const handleNotApprove = async (id) => {
                     {" "}
                     <button className="btn small" style={{ color: "#c62828", fontSize: "0.85em" }} onClick={async () => {
                       if (!window.confirm("Delete this document?")) return;
-                      try { const axios = (await import("axios")).default; await axios.delete(`http://localhost:4000/api/documents/${d.id}`); setViewStudentDocs(prev => prev.filter(x => x.id !== d.id)); } catch(e) { alert("Error deleting."); }
+                      try { const axios = (await import("axios")).default; await axios.delete(`/api/documents/${d.id}`); setViewStudentDocs(prev => prev.filter(x => x.id !== d.id)); } catch(e) { alert("Error deleting."); }
                     }}>Delete</button>
                   </td>
                 </tr>
@@ -1909,7 +1909,7 @@ const handleNotApprove = async (id) => {
               formData.append("student_id", viewStudent.id);
               formData.append("uploaded_by", currentUser?.email || "admin");
               formData.append("category", "admin_upload");
-              const { data: resp } = await axios.post("http://localhost:4000/api/documents", formData);
+              const { data: resp } = await axios.post("/api/documents", formData);
               if (resp?.data) setViewStudentDocs(prev => [resp.data, ...prev]);
               alert("Document uploaded!");
             } catch (err) { alert("Upload failed."); }
@@ -2083,7 +2083,7 @@ const handleNotApprove = async (id) => {
               if (!title) { alert("Title is required"); return; }
               try {
                 const { data: resp } = await (await import("axios")).default.post(
-                  "http://localhost:4000/api/notifications/broadcast",
+                  "/api/notifications/broadcast",
                   { recipient_role: rec === "all" ? null : rec, title, message: msg, type: "broadcast", priority: "medium", created_by: currentUser?.email }
                 );
                 alert(`Broadcast sent to ${resp?.data?.count || 0} recipients!`);

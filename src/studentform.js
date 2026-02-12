@@ -438,7 +438,7 @@ has_scholarship: "",
     formData.append("folder", folder);
 
     const { data } = await (await import("axios")).default.post(
-      "http://localhost:4000/api/upload",
+      "/api/upload",
       formData,
       { headers: { "Content-Type": "multipart/form-data" } }
     );

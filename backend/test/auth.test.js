@@ -1,8 +1,8 @@
 const request = require("supertest");
 const { app, db, createTestUser, getAuthToken, cleanupTables } = require("./helpers");
 
-beforeEach(() => {
-  cleanupTables();
+beforeEach(async () => {
+  await cleanupTables();
 });
 
 describe("POST /api/auth/signup", () => {
@@ -144,7 +144,7 @@ describe("POST /api/auth/reset-password", () => {
     expect(res.body.error).toBeNull();
 
     // Verify token was stored in DB
-    const user = db.prepare("SELECT reset_token FROM users WHERE email = ?").get("reset@example.com");
+    const user = await db.prepare("SELECT reset_token FROM users WHERE email = ?").get("reset@example.com");
     expect(user.reset_token).toBeTruthy();
   });
 });

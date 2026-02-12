@@ -3,8 +3,8 @@ const path = require("path");
 const fs = require("fs");
 const { app, db, createTestStudent, cleanupTables } = require("./helpers");
 
-beforeEach(() => {
-  cleanupTables();
+beforeEach(async () => {
+  await cleanupTables();
 });
 
 // Create a small temp file for upload testing

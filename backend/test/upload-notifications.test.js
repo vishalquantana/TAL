@@ -3,8 +3,8 @@ const path = require("path");
 const fs = require("fs");
 const { app, db, createTestStudent, cleanupTables } = require("./helpers");
 
-beforeEach(() => {
-  cleanupTables();
+beforeEach(async () => {
+  await cleanupTables();
 });
 
 const tmpFile = path.join(__dirname, "test-notif-upload.txt");
@@ -25,7 +25,7 @@ describe("Document upload notifications", () => {
       .field("category", "student_upload")
       .attach("file", tmpFile);
     // Check notifications table for admin-targeted notification
-    const notifs = db.prepare("SELECT * FROM notifications WHERE recipient_role = 'admin'").all();
+    const notifs = await db.prepare("SELECT * FROM notifications WHERE recipient_role = 'admin'").all();
     expect(notifs.length).toBe(1);
     expect(notifs[0].title).toBe("New Document Upload");
     expect(notifs[0].created_by).toBe("student@test.com");
@@ -39,7 +39,7 @@ describe("Document upload notifications", () => {
       .field("uploaded_by", "admin@test.com")
       .field("category", "admin_upload")
       .attach("file", tmpFile);
-    const notifs = db.prepare("SELECT * FROM notifications WHERE recipient_email = 'student2@test.com'").all();
+    const notifs = await db.prepare("SELECT * FROM notifications WHERE recipient_email = 'student2@test.com'").all();
     expect(notifs.length).toBe(1);
     expect(notifs[0].title).toBe("New Document Added");
     expect(notifs[0].created_by).toBe("admin@test.com");

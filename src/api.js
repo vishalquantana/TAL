@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_BASE = "http://localhost:4000";
+const API_BASE = "";
 const TOKEN_KEY = "tal_auth_token";
 
 // Helper to get/set JWT in localStorage

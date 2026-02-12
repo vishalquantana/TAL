@@ -133,8 +133,8 @@ const DonorDashboard = () => {
         try {
           const axios = (await import("axios")).default;
           const [summaryResp, availableResp] = await Promise.all([
-            axios.get("http://localhost:4000/api/fee-payments/summary"),
-            axios.get("http://localhost:4000/api/students/available-for-adoption"),
+            axios.get("/api/fee-payments/summary"),
+            axios.get("/api/students/available-for-adoption"),
           ]);
           if (summaryResp?.data?.data) setFeeSummary(summaryResp.data.data);
           if (availableResp?.data?.data) setAvailableStudents(availableResp.data.data);

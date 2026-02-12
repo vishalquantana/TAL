@@ -47,7 +47,7 @@ export default function ResetPassword() {
 
     try {
       const { data: resp } = await axios.post(
-        "http://localhost:4000/api/auth/reset-password/confirm",
+        "/api/auth/reset-password/confirm",
         { token: resetToken, password }
       );
 

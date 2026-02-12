@@ -26,7 +26,7 @@ describe("QueryBuilder via api.from()", () => {
     axios.get.mockResolvedValue({ data: { data: [{ id: 1 }], error: null } });
     const result = await api.from("student_form_submissions").select("*");
     expect(axios.get).toHaveBeenCalledWith(
-      "http://localhost:4000/api/student-forms",
+      "/api/student-forms",
       expect.objectContaining({ params: expect.any(Object) })
     );
     expect(result.data).toEqual([{ id: 1 }]);
@@ -66,7 +66,7 @@ describe("QueryBuilder via api.from()", () => {
     axios.post.mockResolvedValue({ data: { data: [{ id: 1 }], error: null } });
     const result = await api.from("student_form_submissions").insert({ first_name: "Test" });
     expect(axios.post).toHaveBeenCalledWith(
-      "http://localhost:4000/api/student-forms",
+      "/api/student-forms",
       [{ first_name: "Test" }],
       expect.any(Object)
     );
@@ -77,7 +77,7 @@ describe("QueryBuilder via api.from()", () => {
     axios.put.mockResolvedValue({ data: { data: { id: 1, first_name: "Updated" }, error: null } });
     await api.from("student_form_submissions").update({ first_name: "Updated" }).eq("id", 1);
     expect(axios.put).toHaveBeenCalledWith(
-      "http://localhost:4000/api/student-forms/1",
+      "/api/student-forms/1",
       { first_name: "Updated" },
       expect.any(Object)
     );
@@ -93,7 +93,7 @@ describe("QueryBuilder via api.from()", () => {
     axios.delete.mockResolvedValue({ data: { data: null, error: null } });
     await api.from("student_form_submissions").delete().eq("id", 1);
     expect(axios.delete).toHaveBeenCalledWith(
-      "http://localhost:4000/api/student-forms/1",
+      "/api/student-forms/1",
       expect.any(Object)
     );
   });
@@ -107,12 +107,12 @@ describe("QueryBuilder via api.from()", () => {
   test("TABLE_ENDPOINT_MAP routes correctly", async () => {
     axios.get.mockResolvedValue({ data: { data: [], error: null } });
     await api.from("fee_payments").select("*");
-    expect(axios.get.mock.calls[0][0]).toBe("http://localhost:4000/api/fee-payments");
+    expect(axios.get.mock.calls[0][0]).toBe("/api/fee-payments");
   });
 
   test("unknown table falls back to /api/<table>", async () => {
     axios.get.mockResolvedValue({ data: { data: [], error: null } });
     await api.from("unknown_table").select("*");
-    expect(axios.get.mock.calls[0][0]).toBe("http://localhost:4000/api/unknown_table");
+    expect(axios.get.mock.calls[0][0]).toBe("/api/unknown_table");
   });
 });

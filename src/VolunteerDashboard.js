@@ -51,10 +51,10 @@ export default function VolunteerDashboard() {
       try {
         const axios = (await import("axios")).default;
         const [summaryResp, donationsResp, mappingsResp, feeStructResp] = await Promise.all([
-          axios.get("http://localhost:4000/api/fee-payments/summary"),
-          axios.get("http://localhost:4000/api/donations"),
-          axios.get("http://localhost:4000/api/donor-mapping"),
-          axios.get("http://localhost:4000/api/fee-structures"),
+          axios.get("/api/fee-payments/summary"),
+          axios.get("/api/donations"),
+          axios.get("/api/donor-mapping"),
+          axios.get("/api/fee-structures"),
         ]);
         if (summaryResp.data?.data) setFeeSummary(summaryResp.data.data);
         if (donationsResp.data?.data) setDonations(donationsResp.data.data);
@@ -238,7 +238,7 @@ export default function VolunteerDashboard() {
     }
     try {
       const axios = (await import("axios")).default;
-      const resp = await axios.post("http://localhost:4000/api/fee-structures", {
+      const resp = await axios.post("/api/fee-structures", {
         student_id: parseInt(feeStructureForm.student_id),
         total_fee: parseFloat(feeStructureForm.total_fee),
         num_terms: parseInt(feeStructureForm.num_terms) || 1,
@@ -251,7 +251,7 @@ export default function VolunteerDashboard() {
       setFeeStructureForm({ student_id: "", total_fee: "", num_terms: "1", academic_year: "", notes: "" });
       setFeeStructureTerms([]);
       // Refresh fee structures
-      const refreshResp = await axios.get("http://localhost:4000/api/fee-structures");
+      const refreshResp = await axios.get("/api/fee-structures");
       if (refreshResp.data?.data) setFeeStructures(refreshResp.data.data);
     } catch (err) {
       alert("Error saving fee structure.");

@@ -1,8 +1,8 @@
 const request = require("supertest");
 const { app, createTestStudent, cleanupTables } = require("./helpers");
 
-beforeEach(() => {
-  cleanupTables();
+beforeEach(async () => {
+  await cleanupTables();
 });
 
 describe("POST /api/fee-payments", () => {

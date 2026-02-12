@@ -1,8 +1,8 @@
 const request = require("supertest");
 const { app, db, createTestStudent, cleanupTables } = require("./helpers");
 
-beforeEach(() => {
-  cleanupTables();
+beforeEach(async () => {
+  await cleanupTables();
 });
 
 describe("GET /api/students/available-for-adoption", () => {

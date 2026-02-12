@@ -1,8 +1,8 @@
 const request = require("supertest");
 const { app, createTestUser, cleanupTables } = require("./helpers");
 
-beforeEach(() => {
-  cleanupTables();
+beforeEach(async () => {
+  await cleanupTables();
 });
 
 describe("POST /api/notifications", () => {

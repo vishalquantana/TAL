@@ -1,7 +1,8 @@
 const request = require("supertest");
-const { app, db } = require("./setup");
+const { app, db, ensureInit } = require("./setup");
 
 async function createTestUser(overrides = {}) {
+  await ensureInit();
   const userData = {
     email: overrides.email || `test_${Date.now()}@example.com`,
     password: overrides.password || "TestPass1!",
@@ -18,6 +19,7 @@ async function createTestUser(overrides = {}) {
 }
 
 async function getAuthToken(email, password) {
+  await ensureInit();
   const res = await request(app)
     .post("/api/auth/login")
     .send({ email, password });
@@ -25,6 +27,7 @@ async function getAuthToken(email, password) {
 }
 
 async function createTestStudent(overrides = {}) {
+  await ensureInit();
   const payload = {
     first_name: overrides.first_name || "Test",
     last_name: overrides.last_name || "Student",
@@ -45,18 +48,19 @@ async function createTestStudent(overrides = {}) {
   return res.body.data?.[0] || res.body.data;
 }
 
-function cleanupTables() {
-  db.exec("DELETE FROM academic_records");
-  db.exec("DELETE FROM camp_participation");
-  db.exec("DELETE FROM camps");
-  db.exec("DELETE FROM donations");
-  db.exec("DELETE FROM notifications");
-  db.exec("DELETE FROM donor_mapping");
-  db.exec("DELETE FROM fee_payments");
-  db.exec("DELETE FROM fee_structures");
-  db.exec("DELETE FROM documents");
-  db.exec("DELETE FROM student_form_submissions");
-  db.exec("DELETE FROM users");
+async function cleanupTables() {
+  await ensureInit();
+  await db.exec("DELETE FROM academic_records");
+  await db.exec("DELETE FROM camp_participation");
+  await db.exec("DELETE FROM camps");
+  await db.exec("DELETE FROM donations");
+  await db.exec("DELETE FROM notifications");
+  await db.exec("DELETE FROM donor_mapping");
+  await db.exec("DELETE FROM fee_payments");
+  await db.exec("DELETE FROM fee_structures");
+  await db.exec("DELETE FROM documents");
+  await db.exec("DELETE FROM student_form_submissions");
+  await db.exec("DELETE FROM users");
 }
 
 module.exports = { app, db, createTestUser, getAuthToken, createTestStudent, cleanupTables };

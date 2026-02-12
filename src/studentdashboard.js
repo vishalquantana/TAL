@@ -68,7 +68,7 @@ const StudentDashboard = () => {
           // Fetch documents from documents table
           try {
             const axios = (await import("axios")).default;
-            const { data: docsResp } = await axios.get(`http://localhost:4000/api/documents?student_id=${submission.id}`);
+            const { data: docsResp } = await axios.get(`/api/documents?student_id=${submission.id}`);
             if (docsResp?.data) {
               docsResp.data.forEach(d => {
                 docs.push({ id: d.id, name: d.file_name, type: d.category || "document", url: d.file_url, dbRecord: true });
@@ -122,7 +122,7 @@ const StudentDashboard = () => {
       formData.append("student_id", student.id);
       formData.append("uploaded_by", userEmail);
       formData.append("category", "student_upload");
-      const { data: resp } = await axios.post("http://localhost:4000/api/documents", formData);
+      const { data: resp } = await axios.post("/api/documents", formData);
       if (resp?.error) {
         alert("Upload error: " + resp.error.message);
         return;
@@ -140,7 +140,7 @@ const StudentDashboard = () => {
     if (!window.confirm("Delete this document?")) return;
     try {
       const axios = (await import("axios")).default;
-      await axios.delete(`http://localhost:4000/api/documents/${docId}`);
+      await axios.delete(`/api/documents/${docId}`);
       setDocuments((prev) => prev.filter((d) => d.id !== docId));
     } catch (err) {
       alert("Error deleting document.");
