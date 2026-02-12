@@ -124,6 +124,15 @@ const TABLE_ENDPOINT_MAP = {
   admin_student_info: "/api/admin/students",
   eligible_students: "/api/admin/eligible",
   non_eligible_students: "/api/admin/non-eligible",
+  fee_payments: "/api/fee-payments",
+  donor_mapping: "/api/donor-mappings",
+  notifications: "/api/notifications",
+  donations: "/api/donations",
+  fee_structures: "/api/fee-structures",
+  documents: "/api/documents",
+  camps: "/api/camps",
+  camp_participation: "/api/camp-participation",
+  academic_records: "/api/academic-records",
 };
 
 class QueryBuilder {
@@ -213,19 +222,12 @@ class QueryBuilder {
           params.select = this._selectFields;
         }
 
-        // Add filters as query params
-        if (this._filters.id && this._isSingle) {
-          params.id = this._filters.id;
+        // Pass all eq filters as direct query params
+        for (const [key, value] of Object.entries(this._filters)) {
+          params[key] = value;
+        }
+        if (this._isSingle) {
           params.single = "true";
-        } else if (this._filters.volunteer_email) {
-          params.volunteer_email = this._filters.volunteer_email;
-        } else {
-          // Generic eq filters
-          const filterKeys = Object.keys(this._filters);
-          if (filterKeys.length > 0) {
-            params.eq_field = filterKeys[0];
-            params.eq_value = this._filters[filterKeys[0]];
-          }
         }
 
         if (this._orderField) {
